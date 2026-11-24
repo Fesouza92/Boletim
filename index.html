@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boletim Escolar</title>
+<style>
+  :root { --cor: #3b82f6; }
+  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+  body { background: linear-gradient(135deg, #dbeafe, #dcfce7, #fef3c7); margin: 0; padding: 20px; color: #1e293b; min-height: 100vh; }
+  .box { max-width: 900px; margin: 0 auto; }
+  .card { background: #fff; padding: 22px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
+  h1 { text-align: center; color: #1e1b4b; margin: 0 0 15px; }
+  textarea { width: 100%; height: 95px; padding: 10px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 15px; }
+  .btns { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  button { border: none; padding: 11px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px; }
+  .verde { background: #16a34a; color: #fff; }
+  .azul-btn { background: #2563eb; color: #fff; }
+  .vermelho { background: #fee2e2; color: #dc2626; }
+  .abas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 18px; }
+  @media(max-width:650px){ .abas { grid-template-columns: repeat(2, 1fr); } }
+  .aba { background: #f1f5f9; color: #475569; border: 2px solid #e2e8f0; padding: 12px 5px; }
+  .aba.ativa { color: #fff; border-color: transparent; }
+  .aba[data-m="portugues"].ativa { background: #3b82f6; }
+  .aba[data-m="ciencias"].ativa { background: #10b981; }
+  .aba[data-m="matematica"].ativa { background: #f59e0b; }
+  .aba[data-m="geografia"].ativa { background: #06b6d4; }
+  .aba[data-m="historia"].ativa { background: #8b5cf6; }
+  .painel { border-top: 7px solid var(--cor); }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: center; }
+  th:first-child, td:first-child { text-align: left; }
+  input { width: 62px; padding: 7px; text-align: center; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: bold; font-size: 15px; }
+  .media { padding: 5px 12px; border-radius: 15px; font-weight: bold; background: #e2e8f0; }
+  .azul { background: #dcfce7; color: #15803d; }
+  .verm { background: #fee2e2; color: #b91c1c; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🎨 Boletim Escolar Interativo</h1>
+  <div class="card">
+    <strong>1. Cole os nomes dos alunos (um por linha):</strong>
+    <textarea id="txt" placeholder="Ana Clara&#10;Bruno Silva&#10;Carla Souza"></textarea>
+    <div class="btns">
+      <button type="button" class="verde" onclick="carregar()">✅ Carregar Alunos</button>
+      <button type="button" class="azul-btn" onclick="baixarExcel()">📥 Baixar Planilha (Excel)</button>
+      <button type="button" class="vermelho" onclick="limpar()">🗑️ Apagar Tudo</button>
+    </div>
+  </div>
+  <div class="card painel">
+    <div class="abas">
+      <button type="button" class="aba ativa" data-m="portugues" onclick="mudarMat('portugues', '#3b82f6', this)">📖 Português</button>
+      <button type="button" class="aba" data-m="ciencias" onclick="mudarMat('ciencias', '#10b981', this)">🔬 Ciências</button>
+      <button type="button" class="aba" data-m="matematica" onclick="mudarMat('matematica', '#f59e0b', this)">📐 Matemática</button>
+      <button type="button" class="aba" data-m="geografia" onclick="mudarMat('geografia', '#06b6d4', this)">🌍 Geografia</button>
+      <button type="button" class="aba" data-m="historia" onclick="mudarMat('historia', '#8b5cf6', this)">🏛️ História</button>
+    </div>
+    <h2 id="tit" style="color:var(--cor);margin:0">📖 Português</h2>
+    <div id="tab" style="padding:20px;text-align:center;color:#64748b">Cole os nomes acima e clique em Carregar Alunos.</div>
+  </div>
+</div>
+<script>
+let mat = 'portugues';
+let alunos = [];
+let notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
+const nomesMat = { portugues:'Português', ciencias:'Ciências', matematica:'Matemática', geografia:'Geografia', historia:'História' };
+
+try {
+  const s = localStorage.getItem('boletim_salvo_v4');
+  if (s) {
+    const d = JSON.parse(s);
+    alunos = d.alunos || [];
+    notas = d.notas || notas;
+  }
+} catch(e) {}
+
+window.onload = function() {
+  if (alunos.length) {
+    document.getElementById('txt').value = alunos.join('\n');
+    desenhar();
+  }
+};
+
+function salvar() {
+  try {
+    localStorage.setItem('boletim_salvo_v4', JSON.stringify({ alunos: alunos, notas: notas }));
+  } catch(e) {}
+}
+
+function carregar() {
+  const linhas = document.getElementById('txt').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (!linhas.length) return;
+  alunos = Array.from(new Set(linhas));
+  Object.keys(notas).forEach(m => {
+    alunos.forEach(a => {
+      if (!notas[m][a]) {
+        notas[m][a] = { n1:'', n2:'', n3:'', n4:'' };
+      }
+    });
+  });
+  salvar();
+  desenhar();
+}
+
+function limpar() {
+  alunos = [];
+  notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
+  document.getElementById('txt').value = '';
+  document.getElementById('tab').innerHTML = 'Lista apagada. Cole novos nomes acima.';
+  try { localStorage.removeItem('boletim_salvo_v4'); } catch(e) {}
+}
+
+function mudarMat(m, cor, btn) {
+  mat = m;
+  document.documentElement.style.setProperty('--cor', cor);
+  document.getElementById('tit').textContent = btn.textContent;
+  document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
+  btn.classList.add('ativa');
+  if (alunos.length) desenhar();
+}
+
+function obterMedia(objNotas) {
+  const lista = [objNotas.n1, objNotas.n2, objNotas.n3, objNotas.n4].filter(x => x !== '').map(Number);
+  if (!lista.length) return null;
+  const soma = lista.reduce((acc, v) => acc + v, 0);
+  return (soma / 4).toFixed(1);
+}
+
+function calc(idx, chave, val) {
+  const a = alunos.at(idx);
+  let n = val === '' ? '' : Math.min(10, Math.max(0, parseFloat(val)));
+  notas[mat][a][chave] = isNaN(n) ? '' : n;
+  salvar();
+  const med = obterMedia(notas[mat][a]);
+  const el = document.getElementById('m-' + idx);
+  if (med === null) {
+    el.textContent = '-';
+    el.className = 'media';
+    return;
+  }
+  el.textContent = med;
+  el.className = 'media ' + (parseFloat(med) >= 6 ? 'azul' : 'verm');
+}
+
+function desenhar() {
+  let h = '<table><tr><th>Aluno</th><th>Nota 1</th><th>Nota 2</th><th>Nota 3</th><th>Nota 4</th><th>Média</th></tr>';
+  alunos.forEach((a, idx) => {
+    const obj = notas[mat][a];
+    const med = obterMedia(obj);
+    const cls = med === null ? 'media' : (parseFloat(med) >= 6 ? 'media azul' : 'media verm');
+    h += '<tr><td><strong>' + a + '</strong></td>' +
+      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n1 + '" oninput="calc(' + idx + ',\'n1\',this.value)"></td>' +
+      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n2 + '" oninput="calc(' + idx + ',\'n2\',this.value)"></td>' +
+      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n3 + '" oninput="calc(' + idx + ',\'n3\',this.value)"></td>' +
+      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n4 + '" oninput="calc(' + idx + ',\'n4\',this.value)"></td>' +
+      '<td><span id="m-' + idx + '" class="' + cls + '">' + (med !== null ? med : '-') + '</span></td></tr>';
+  });
+  document.getElementById('tab').innerHTML = h + '</table>';
+}
+
+function baixarExcel() {
+  if (!alunos.length) return;
+  let csv = '\uFEFFAluno;Matéria;Nota 1;Nota 2;Nota 3;Nota 4;Média Final\n';
+  alunos.forEach(a => {
+    Object.keys(nomesMat).forEach(m => {
+      const obj = notas[m][a] || { n1:'', n2:'', n3:'', n4:'' };
+      const med = obterMedia(obj);
+      const medStr = med !== null ? med.replace('.', ',') : '-';
+      const f = v => v === '' ? '' : String(v).replace('.', ',');
+      csv += a + ';' + nomesMat[m] + ';' + f(obj.n1) + ';' + f(obj.n2) + ';' + f(obj.n3) + ';' + f(obj.n4) + ';' + medStr + '\n';
+    });
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'boletim_escolar.csv';
+  link.click();
+}
+</script>
+</body>
+</html>
