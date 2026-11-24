@@ -1,70 +1,68 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Boletim Escolar</title>
-<style>
-  :root { --cor: #3b82f6; }
-  * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-  body { background: linear-gradient(135deg, #dbeafe, #dcfce7, #fef3c7); margin: 0; padding: 20px; color: #1e293b; min-height: 100vh; }
-  .box { max-width: 900px; margin: 0 auto; }
-  .card { background: #fff; padding: 22px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
-  h1 { text-align: center; color: #1e1b4b; margin: 0 0 15px; }
-  textarea { width: 100%; height: 95px; padding: 10px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 15px; }
-  .btns { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-  button { border: none; padding: 11px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px; }
-  .verde { background: #16a34a; color: #fff; }
-  .azul-btn { background: #2563eb; color: #fff; }
-  .vermelho { background: #fee2e2; color: #dc2626; }
-  .abas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 18px; }
-  @media(max-width:650px){ .abas { grid-template-columns: repeat(2, 1fr); } }
-  .aba { background: #f1f5f9; color: #475569; border: 2px solid #e2e8f0; padding: 12px 5px; }
-  .aba.ativa { color: #fff; border-color: transparent; }
-  .aba[data-m="portugues"].ativa { background: #3b82f6; }
-  .aba[data-m="ciencias"].ativa { background: #10b981; }
-  .aba[data-m="matematica"].ativa { background: #f59e0b; }
-  .aba[data-m="geografia"].ativa { background: #06b6d4; }
-  .aba[data-m="historia"].ativa { background: #8b5cf6; }
-  .painel { border-top: 7px solid var(--cor); }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: center; }
-  th:first-child, td:first-child { text-align: left; }
-  input { width: 62px; padding: 7px; text-align: center; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: bold; font-size: 15px; }
-  .media { padding: 5px 12px; border-radius: 15px; font-weight: bold; background: #e2e8f0; }
-  .azul { background: #dcfce7; color: #15803d; }
-  .verm { background: #fee2e2; color: #b91c1c; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boletim Escolar</title>
+  <!-- Biblioteca para gerar Excel (.xlsx) com múltiplas abas -->
+  <script src="https://sheetjs.com"></script>
+  <style>
+    :root { --cor: #2563eb; }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
+    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    textarea { width: 100%; height: 90px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; font-size: 14px; }
+    .acoes { display: flex; gap: 10px; margin: 12px 0 24px; flex-wrap: wrap; }
+    button { cursor: pointer; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: 0.2s; }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-excel { background: #16a34a; color: #fff; }
+    .btn-excel:hover { background: #15803d; }
+    .btn-danger { background: #fee2e2; color: #dc2626; }
+    .btn-danger:hover { background: #fecaca; }
+    .abas { display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px; }
+    .tab { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+    .tab.ativa { background: var(--cor); color: #fff; border-color: var(--cor); }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: center; }
+    th:first-child, td:first-child { text-align: left; }
+    th { background: #f8fafc; color: #475569; font-size: 13px; }
+    input[type="number"] { width: 68px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-size: 14px; }
+    .media { font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block; min-width: 45px; }
+    .azul { background: #dbeafe; color: #1d4ed8; }
+    .verm { background: #fee2e2; color: #dc2626; }
+  </style>
 </head>
 <body>
-<div class="box">
-  <h1>🎨 Boletim Escolar Interativo</h1>
-  <div class="card">
-    <strong>1. Cole os nomes dos alunos (um por linha):</strong>
-    <textarea id="txt" placeholder="Ana Clara&#10;Bruno Silva&#10;Carla Souza"></textarea>
-    <div class="btns">
-      <button type="button" class="verde" onclick="carregar()">✅ Carregar Alunos</button>
-      <button type="button" class="azul-btn" onclick="baixarExcel()">📥 Baixar Planilha (Excel)</button>
-      <button type="button" class="vermelho" onclick="limpar()">🗑️ Apagar Tudo</button>
-    </div>
+
+<div class="container">
+  <h1 style="margin-top:0">📚 Controle de Notas</h1>
+  <textarea id="txt" placeholder="Cole os nomes dos alunos aqui (um por linha)..."></textarea>
+  
+  <div class="acoes">
+    <button type="button" class="btn-primary" onclick="carregar()">Carregar Alunos</button>
+    <button type="button" class="btn-excel" onclick="baixarExcel()">📥 Exportar Excel (Abas Separadas)</button>
+    <button type="button" class="btn-danger" onclick="limpar()">Limpar Tudo</button>
   </div>
-  <div class="card painel">
+
+  <div>
     <div class="abas">
-      <button type="button" class="aba ativa" data-m="portugues" onclick="mudarMat('portugues', '#3b82f6', this)">📖 Português</button>
-      <button type="button" class="aba" data-m="ciencias" onclick="mudarMat('ciencias', '#10b981', this)">🔬 Ciências</button>
-      <button type="button" class="aba" data-m="matematica" onclick="mudarMat('matematica', '#f59e0b', this)">📐 Matemática</button>
-      <button type="button" class="aba" data-m="geografia" onclick="mudarMat('geografia', '#06b6d4', this)">🌍 Geografia</button>
-      <button type="button" class="aba" data-m="historia" onclick="mudarMat('historia', '#8b5cf6', this)">🏛️ História</button>
+      <button type="button" class="tab ativa" data-m="portugues" onclick="mudarMat('portugues', '#2563eb', this)">📖 Português</button>
+      <button type="button" class="tab" data-m="ciencias" onclick="mudarMat('ciencias', '#10b981', this)">🔬 Ciências</button>
+      <button type="button" class="tab" data-m="matematica" onclick="mudarMat('matematica', '#f59e0b', this)">📐 Matemática</button>
+      <button type="button" class="tab" data-m="geografia" onclick="mudarMat('geografia', '#06b6d4', this)">🌍 Geografia</button>
+      <button type="button" class="tab" data-m="historia" onclick="mudarMat('historia', '#8b5cf6', this)">🏛️ História</button>
     </div>
     <h2 id="tit" style="color:var(--cor);margin:0">📖 Português</h2>
     <div id="tab" style="padding:20px;text-align:center;color:#64748b">Cole os nomes acima e clique em Carregar Alunos.</div>
   </div>
 </div>
+
 <script>
 let mat = 'portugues';
 let alunos = [];
 let notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
-const nomesMat = { portugues:'Português', ciencias:'Ciências', matematica:'Matemática', geografia:'Geografia', historia:'História' };
+const Mat = { portugues:'Português', ciencias:'Ciências', matematica:'Matemática', geografia:'Geografia', historia:'História' };
 
 try {
   const s = localStorage.getItem('boletim_salvo_v4');
@@ -111,12 +109,12 @@ function limpar() {
   try { localStorage.removeItem('boletim_salvo_v4'); } catch(e) {}
 }
 
-function mudarMat(m, cor, btn) {
+function mudarMat(m, cor, botao) {
   mat = m;
   document.documentElement.style.setProperty('--cor', cor);
-  document.getElementById('tit').textContent = btn.textContent;
-  document.querySelectorAll('.aba').forEach(b => b.classList.remove('ativa'));
-  btn.classList.add('ativa');
+  document.getElementById('tit').textContent = botao.textContent;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('ativa'));
+  botao.classList.add('ativa');
   if (alunos.length) desenhar();
 }
 
@@ -160,23 +158,49 @@ function desenhar() {
 }
 
 function baixarExcel() {
-  if (!alunos.length) return;
-  let csv = '\uFEFFAluno;Matéria;Nota 1;Nota 2;Nota 3;Nota 4;Média Final\n';
-  alunos.forEach(a => {
-    Object.keys(nomesMat).forEach(m => {
+  if (!alunos.length) {
+    alert('Carregue os alunos antes de exportar.');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  Object.keys(Mat).forEach(m => {
+    const linhas = [
+      ['Aluno', 'Nota 1', 'Nota 2', 'Nota 3', 'Nota 4', 'Média Final']
+    ];
+
+    alunos.forEach(a => {
       const obj = notas[m][a] || { n1:'', n2:'', n3:'', n4:'' };
       const med = obterMedia(obj);
-      const medStr = med !== null ? med.replace('.', ',') : '-';
-      const f = v => v === '' ? '' : String(v).replace('.', ',');
-      csv += a + ';' + nomesMat[m] + ';' + f(obj.n1) + ';' + f(obj.n2) + ';' + f(obj.n3) + ';' + f(obj.n4) + ';' + medStr + '\n';
+      linhas.push([
+        a,
+        obj.n1 === '' ? '' : Number(obj.n1),
+        obj.n2 === '' ? '' : Number(obj.n2),
+        obj.n3 === '' ? '' : Number(obj.n3),
+        obj.n4 === '' ? '' : Number(obj.n4),
+        med !== null ? Number(med) : '-'
+      ]);
     });
+
+    const ws = XLSX.utils.aoa_to_sheet(linhas);
+
+    // Ajusta a largura das colunas no Excel para não cortar os nomes
+    ws['!cols'] = [
+      { wch: 30 }, // Aluno
+      { wch: 10 }, // Nota 1
+      { wch: 10 }, // Nota 2
+      { wch: 10 }, // Nota 3
+      { wch: 10 }, // Nota 4
+      { wch: 14 }  // Média Final
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, Mat[m]);
   });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'boletim_escolar.csv';
-  link.click();
+
+  XLSX.writeFile(wb, 'boletim_escolar.xlsx');
 }
 </script>
 </body>
 </html>
+
