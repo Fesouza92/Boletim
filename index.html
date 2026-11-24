@@ -4,203 +4,186 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Boletim Escolar</title>
-  <!-- Biblioteca para gerar Excel (.xlsx) com múltiplas abas -->
-  <script src="https://sheetjs.com"></script>
   <style>
     :root { --cor: #2563eb; }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
-    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    textarea { width: 100%; height: 90px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; font-size: 14px; }
-    .acoes { display: flex; gap: 10px; margin: 12px 0 24px; flex-wrap: wrap; }
-    button { cursor: pointer; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: 0.2s; }
-    .btn-primary { background: #2563eb; color: #fff; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-excel { background: #16a34a; color: #fff; }
-    .btn-excel:hover { background: #15803d; }
-    .btn-danger { background: #fee2e2; color: #dc2626; }
-    .btn-danger:hover { background: #fecaca; }
-    .abas { display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px; }
-    .tab { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
-    .tab.ativa { background: var(--cor); color: #fff; border-color: var(--cor); }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: center; }
-    th:first-child, td:first-child { text-align: left; }
-    th { background: #f8fafc; color: #475569; font-size: 13px; }
-    input[type="number"] { width: 68px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-size: 14px; }
-    .media { font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block; min-width: 45px; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #eef2f6; margin: 0; padding: 24px 16px; color: #1e293b; }
+    .box { max-width: 1000px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(15,23,42,.07); overflow: hidden; }
+    .topo { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; padding: 24px 28px; }
+    .topo h1 { margin: 0; font-size: 22px; }
+    .topo p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+    .corpo { padding: 24px 28px; }
+    textarea { width: 100%; height: 80px; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; resize: vertical; }
+    textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px #dbeafe; }
+    .acoes { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 24px; }
+    button { cursor: pointer; border: none; padding: 10px 16px; border-radius: 9px; font-weight: 600; font-size: 13.5px; transition: .15s; }
+    .btn-p { background: #2563eb; color: #fff; } .btn-p:hover { background: #1d4ed8; }
+    .btn-e { background: #16a34a; color: #fff; } .btn-e:hover { background: #15803d; }
+    .btn-d { background: #fee2e2; color: #dc2626; margin-left: auto; } .btn-d:hover { background: #fecaca; }
+    .abas { display: flex; gap: 8px; flex-wrap: wrap; background: #f8fafc; padding: 8px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+    .tab { background: transparent; color: #475569; padding: 8px 14px; border-radius: 8px; }
+    .tab:hover { background: #e2e8f0; }
+    .tab.ativa { background: var(--cor); color: #fff; }
+    .barra-mat { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+    .barra-mat h2 { margin: 0; font-size: 19px; color: var(--cor); }
+    .resumo { display: flex; gap: 10px; font-size: 12.5px; font-weight: 600; }
+    .pill { padding: 5px 12px; border-radius: 20px; background: #f1f5f9; color: #475569; }
+    .pill.ap { background: #dcfce7; color: #15803d; }
+    .pill.rp { background: #fee2e2; color: #b91c1c; }
+    .tab-wrap { border: 1px solid #e2e8f0; border-radius: 12px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 620px; }
+    th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 14px; }
+    tr:hover td { background: #f8fafc; }
+    th:first-child, td:first-child { text-align: left; padding-left: 16px; }
+    input { width: 66px; padding: 7px; border: 1.5px solid #cbd5e1; border-radius: 7px; text-align: center; font-weight: 600; font-size: 14px; }
+    input:focus { outline: none; border-color: var(--cor); }
+    .badge { font-weight: 700; padding: 5px 11px; border-radius: 20px; display: inline-block; font-size: 12.5px; min-width: 48px; }
     .azul { background: #dbeafe; color: #1d4ed8; }
     .verm { background: #fee2e2; color: #dc2626; }
   </style>
 </head>
 <body>
-
-<div class="container">
-  <h1 style="margin-top:0">📚 Controle de Notas</h1>
-  <textarea id="txt" placeholder="Cole os nomes dos alunos aqui (um por linha)..."></textarea>
-  
-  <div class="acoes">
-    <button type="button" class="btn-primary" onclick="carregar()">Carregar Alunos</button>
-    <button type="button" class="btn-excel" onclick="baixarExcel()">📥 Exportar Excel (Abas Separadas)</button>
-    <button type="button" class="btn-danger" onclick="limpar()">Limpar Tudo</button>
+<div class="box">
+  <div class="topo">
+    <h1>📚 Boletim & Controle de Notas</h1>
+    <p>Gerencie as notas por disciplina, acompanhe aprovações e exporte em abas separadas para Excel</p>
   </div>
-
-  <div>
-    <div class="abas">
-      <button type="button" class="tab ativa" data-m="portugues" onclick="mudarMat('portugues', '#2563eb', this)">📖 Português</button>
-      <button type="button" class="tab" data-m="ciencias" onclick="mudarMat('ciencias', '#10b981', this)">🔬 Ciências</button>
-      <button type="button" class="tab" data-m="matematica" onclick="mudarMat('matematica', '#f59e0b', this)">📐 Matemática</button>
-      <button type="button" class="tab" data-m="geografia" onclick="mudarMat('geografia', '#06b6d4', this)">🌍 Geografia</button>
-      <button type="button" class="tab" data-m="historia" onclick="mudarMat('historia', '#8b5cf6', this)">🏛️ História</button>
+  <div class="corpo">
+    <textarea id="txt" placeholder="Cole os nomes dos alunos aqui (um nome por linha)..."></textarea>
+    <div class="acoes">
+      <button type="button" class="btn-p" onclick="carregar()">👥 Carregar Alunos</button>
+      <button type="button" class="btn-e" onclick="baixarExcel()">📥 Exportar Excel (Abas Separadas)</button>
+      <button type="button" class="btn-d" onclick="limpar()">🗑️ Limpar Tudo</button>
     </div>
-    <h2 id="tit" style="color:var(--cor);margin:0">📖 Português</h2>
-    <div id="tab" style="padding:20px;text-align:center;color:#64748b">Cole os nomes acima e clique em Carregar Alunos.</div>
+    <div class="abas">
+      <button type="button" class="tab ativa" onclick="mudarMat('portugues','#2563eb',this)">📖 Português</button>
+      <button type="button" class="tab" onclick="mudarMat('ciencias','#059669',this)">🔬 Ciências</button>
+      <button type="button" class="tab" onclick="mudarMat('matematica','#d97706',this)">📐 Matemática</button>
+      <button type="button" class="tab" onclick="mudarMat('geografia','#0891b2',this)">🌍 Geografia</button>
+      <button type="button" class="tab" onclick="mudarMat('historia','#7c3aed',this)">🏛️ História</button>
+    </div>
+    <div class="barra-mat">
+      <h2 id="tit">📖 Português</h2>
+      <div class="resumo" id="resumo"></div>
+    </div>
+    <div id="tab" style="padding:32px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:12px">Cole os nomes acima e clique em <strong>Carregar Alunos</strong>.</div>
   </div>
 </div>
-
 <script>
-let mat = 'portugues';
-let alunos = [];
+let mat = 'portugues', alunos = [];
 let notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
 const Mat = { portugues:'Português', ciencias:'Ciências', matematica:'Matemática', geografia:'Geografia', historia:'História' };
 
 try {
   const s = localStorage.getItem('boletim_salvo_v4');
-  if (s) {
-    const d = JSON.parse(s);
-    alunos = d.alunos || [];
-    notas = d.notas || notas;
-  }
+  if (s) { const d = JSON.parse(s); alunos = d.alunos || []; notas = d.notas || notas; }
 } catch(e) {}
 
-window.onload = function() {
-  if (alunos.length) {
-    document.getElementById('txt').value = alunos.join('\n');
-    desenhar();
-  }
-};
-
-function salvar() {
-  try {
-    localStorage.setItem('boletim_salvo_v4', JSON.stringify({ alunos: alunos, notas: notas }));
-  } catch(e) {}
-}
+window.onload = () => { if (alunos.length) { document.getElementById('txt').value = alunos.join('\n'); desenhar(); } };
+function salvar() { try { localStorage.setItem('boletim_salvo_v4', JSON.stringify({ alunos, notas })); } catch(e) {} }
 
 function carregar() {
   const linhas = document.getElementById('txt').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   if (!linhas.length) return;
-  alunos = Array.from(new Set(linhas));
-  Object.keys(notas).forEach(m => {
-    alunos.forEach(a => {
-      if (!notas[m][a]) {
-        notas[m][a] = { n1:'', n2:'', n3:'', n4:'' };
-      }
-    });
-  });
-  salvar();
-  desenhar();
+  alunos = [...new Set(linhas)];
+  Object.keys(notas).forEach(m => alunos.forEach(a => { if (!notas[m][a]) notas[m][a] = { n1:'', n2:'', n3:'', n4:'' }; }));
+  salvar(); desenhar();
 }
 
 function limpar() {
-  alunos = [];
-  notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
+  if (!confirm('Deseja apagar todos os alunos e notas?')) return;
+  alunos = []; notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
   document.getElementById('txt').value = '';
+  document.getElementById('resumo').innerHTML = '';
   document.getElementById('tab').innerHTML = 'Lista apagada. Cole novos nomes acima.';
   try { localStorage.removeItem('boletim_salvo_v4'); } catch(e) {}
 }
 
-function mudarMat(m, cor, botao) {
+function mudarMat(m, cor, btn) {
   mat = m;
   document.documentElement.style.setProperty('--cor', cor);
-  document.getElementById('tit').textContent = botao.textContent;
+  document.getElementById('tit').textContent = btn.textContent;
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('ativa'));
-  botao.classList.add('ativa');
+  btn.classList.add('ativa');
   if (alunos.length) desenhar();
 }
 
-function obterMedia(objNotas) {
-  const lista = [objNotas.n1, objNotas.n2, objNotas.n3, objNotas.n4].filter(x => x !== '').map(Number);
-  if (!lista.length) return null;
-  const soma = lista.reduce((acc, v) => acc + v, 0);
-  return (soma / 4).toFixed(1);
+function obterMedia(o) {
+  const l = [o.n1, o.n2, o.n3, o.n4].filter(x => x !== '').map(Number);
+  return l.length ? (l.reduce((a, b) => a + b, 0) / 4).toFixed(1) : null;
+}
+function obterSit(med) { return med === null ? '-' : (parseFloat(med) < 5 ? 'Reprovado' : 'Aprovado'); }
+
+function atualizarResumo() {
+  let ap = 0, rp = 0;
+  alunos.forEach(a => {
+    const med = obterMedia(notas[mat][a] || {});
+    if (med !== null) parseFloat(med) < 5 ? rp++ : ap++;
+  });
+  document.getElementById('resumo').innerHTML = alunos.length
+    ? `<span class="pill">Total: ${alunos.length}</span><span class="pill ap">Aprovados: ${ap}</span><span class="pill rp">Reprovados: ${rp}</span>` : '';
 }
 
-function calc(idx, chave, val) {
-  const a = alunos.at(idx);
-  let n = val === '' ? '' : Math.min(10, Math.max(0, parseFloat(val)));
-  notas[mat][a][chave] = isNaN(n) ? '' : n;
+function calc(idx, k, val) {
+  const a = alunos[idx];
+  const n = val === '' ? '' : Math.min(10, Math.max(0, parseFloat(val)));
+  notas[mat][a][k] = isNaN(n) ? '' : n;
   salvar();
-  const med = obterMedia(notas[mat][a]);
-  const el = document.getElementById('m-' + idx);
-  if (med === null) {
-    el.textContent = '-';
-    el.className = 'media';
-    return;
-  }
-  el.textContent = med;
-  el.className = 'media ' + (parseFloat(med) >= 6 ? 'azul' : 'verm');
+  const med = obterMedia(notas[mat][a]), sit = obterSit(med);
+  const elM = document.getElementById('m-' + idx), elS = document.getElementById('s-' + idx);
+  const cls = med === null ? 'badge' : (parseFloat(med) < 5 ? 'badge verm' : 'badge azul');
+  elM.textContent = med !== null ? med : '-'; elM.className = cls;
+  elS.textContent = sit; elS.className = cls;
+  atualizarResumo();
 }
 
 function desenhar() {
-  let h = '<table><tr><th>Aluno</th><th>Nota 1</th><th>Nota 2</th><th>Nota 3</th><th>Nota 4</th><th>Média</th></tr>';
+  let h = '<div class="tab-wrap"><table><tr><th>Aluno</th><th>Nota 1</th><th>Nota 2</th><th>Nota 3</th><th>Nota 4</th><th>Média</th><th>Situação</th></tr>';
   alunos.forEach((a, idx) => {
-    const obj = notas[mat][a];
-    const med = obterMedia(obj);
-    const cls = med === null ? 'media' : (parseFloat(med) >= 6 ? 'media azul' : 'media verm');
-    h += '<tr><td><strong>' + a + '</strong></td>' +
-      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n1 + '" oninput="calc(' + idx + ',\'n1\',this.value)"></td>' +
-      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n2 + '" oninput="calc(' + idx + ',\'n2\',this.value)"></td>' +
-      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n3 + '" oninput="calc(' + idx + ',\'n3\',this.value)"></td>' +
-      '<td><input type="number" step="0.1" min="0" max="10" value="' + obj.n4 + '" oninput="calc(' + idx + ',\'n4\',this.value)"></td>' +
-      '<td><span id="m-' + idx + '" class="' + cls + '">' + (med !== null ? med : '-') + '</span></td></tr>';
+    const o = notas[mat][a], med = obterMedia(o), sit = obterSit(med);
+    const cls = med === null ? 'badge' : (parseFloat(med) < 5 ? 'badge verm' : 'badge azul');
+    h += `<tr><td><strong>${a}</strong></td>` +
+      ['n1','n2','n3','n4'].map(k => `<td><input type="number" step="0.1" min="0" max="10" value="${o[k]}" oninput="calc(${idx},'${k}',this.value)"></td>`).join('') +
+      `<td><span id="m-${idx}" class="${cls}">${med !== null ? med : '-'}</span></td>` +
+      `<td><span id="s-${idx}" class="${cls}">${sit}</span></td></tr>`;
   });
-  document.getElementById('tab').innerHTML = h + '</table>';
+  document.getElementById('tab').style.cssText = '';
+  document.getElementById('tab').innerHTML = h + '</table></div>';
+  atualizarResumo();
 }
 
-function baixarExcel() {
-  if (!alunos.length) {
-    alert('Carregue os alunos antes de exportar.');
-    return;
-  }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  const wb = XLSX.utils.book_new();
+function baixarExcel() {
+  if (!alunos.length) return alert('Carregue os alunos antes de exportar.');
+  let xml = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>' +
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' +
+    '<Styles><Style ss:ID="h"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#2563EB" ss:Pattern="Solid"/></Style>' +
+    '<Style ss:ID="ap"><Font ss:Bold="1" ss:Color="#1D4ED8"/></Style>' +
+    '<Style ss:ID="rp"><Font ss:Bold="1" ss:Color="#DC2626"/></Style></Styles>';
 
   Object.keys(Mat).forEach(m => {
-    const linhas = [
-      ['Aluno', 'Nota 1', 'Nota 2', 'Nota 3', 'Nota 4', 'Média Final']
-    ];
+    xml += `<Worksheet ss:Name="${Mat[m]}"><Table><Column ss:Width="180"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="80"/><Column ss:Width="95"/>` +
+      '<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 1</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 2</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 3</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 4</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Média Final</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Situação</Data></Cell></Row>';
 
     alunos.forEach(a => {
-      const obj = notas[m][a] || { n1:'', n2:'', n3:'', n4:'' };
-      const med = obterMedia(obj);
-      linhas.push([
-        a,
-        obj.n1 === '' ? '' : Number(obj.n1),
-        obj.n2 === '' ? '' : Number(obj.n2),
-        obj.n3 === '' ? '' : Number(obj.n3),
-        obj.n4 === '' ? '' : Number(obj.n4),
-        med !== null ? Number(med) : '-'
-      ]);
+      const o = notas[m][a] || { n1:'', n2:'', n3:'', n4:'' }, med = obterMedia(o), sit = obterSit(med);
+      const st = sit === 'Reprovado' ? ' ss:StyleID="rp"' : (sit === 'Aprovado' ? ' ss:StyleID="ap"' : '');
+      const cel = v => v === '' ? '<Cell><Data ss:Type="String"></Data></Cell>' : `<Cell><Data ss:Type="Number">${Number(v)}</Data></Cell>`;
+      xml += `<Row><Cell><Data ss:Type="String">${esc(a)}</Data></Cell>${cel(o.n1)}${cel(o.n2)}${cel(o.n3)}${cel(o.n4)}` +
+        (med !== null ? `<Cell><Data ss:Type="Number">${Number(med)}</Data></Cell>` : '<Cell><Data ss:Type="String">-</Data></Cell>') +
+        `<Cell${st}><Data ss:Type="String">${sit}</Data></Cell></Row>`;
     });
-
-    const ws = XLSX.utils.aoa_to_sheet(linhas);
-
-    // Ajusta a largura das colunas no Excel para não cortar os nomes
-    ws['!cols'] = [
-      { wch: 30 }, // Aluno
-      { wch: 10 }, // Nota 1
-      { wch: 10 }, // Nota 2
-      { wch: 10 }, // Nota 3
-      { wch: 10 }, // Nota 4
-      { wch: 14 }  // Média Final
-    ];
-
-    XLSX.utils.book_append_sheet(wb, ws, Mat[m]);
+    xml += '</Table></Worksheet>';
   });
 
-  XLSX.writeFile(wb, 'boletim_escolar.xlsx');
+  const blob = new Blob([xml + '</Workbook>'], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'boletim_escolar.xls';
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
 </script>
 </body>
 </html>
-
