@@ -20,7 +20,7 @@
   .turma-box select option { color: #0f172a; background: #fff; }
   .btn-icon { background: rgba(255,255,255,.14); color: #fff; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; padding: 0; font-size: 14px; transition: .15s; justify-content: center; }
   .btn-icon:hover { background: rgba(255,255,255,.28); transform: translateY(-1px); }
-  .status-save { background: rgba(16,185,129,.18); border: 1px solid rgba(52,211,153,.35); color: #6ee7b7; padding: 7px 14px; border-radius: 99px; font-size: 12.5px; font-weight: 600; }
+  .status-save { background: rgba(16,185,129,.18); border: 1px solid rgba(52,211,153,.35); color: #6ee7b7; padding: 7px 14px; border-radius: 99px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
   .corpo { padding: 28px 34px; }
   .painel { background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 24px; }
   .painel-head { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px; font-weight: 700; color: #334155; }
@@ -35,7 +35,7 @@
   .btn-d { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; margin-left: auto; } .btn-d:hover { background: #fee2e2; }
   .corte-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #475569; background: #fff; padding: 6px 12px; border-radius: 11px; border: 1px solid #cbd5e1; }
   .corte-box input { width: 50px; padding: 3px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-weight: 700; color: #0f172a; }
-  .abas-wrap { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #f1f5f9; padding: 7px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 22px; }
+    .abas-wrap { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #f1f5f9; padding: 7px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 22px; }
   .abas { display: flex; gap: 6px; flex-wrap: wrap; }
   .tab { background: transparent; color: #475569; padding: 9px 15px; border-radius: 11px; font-weight: 600; }
   .tab:hover { background: rgba(255,255,255,.7); color: #0f172a; }
@@ -102,7 +102,7 @@
         <button class="btn-icon" title="Nova Turma" onclick="novaTurma()">+</button>
         <button class="btn-icon" title="Renomear Turma" onclick="renomearTurma()">✎</button>
       </div>
-      <div class="status-save" id="status-save">☁️ Conectando...</div>
+      <div class="status-save" id="status-save" title="Clique para forçar sincronização" onclick="salvarDados('Sincronizando com a nuvem...')">☁️ Conectando...</div>
     </div>
   </header>
 
@@ -164,6 +164,7 @@
 <div class="toast" id="toast"></div>
 <script>
   const FIREBASE_URL = 'https://firebaseio.com';
+  const STORAGE_KEY = 'boletim_escolar_4d_v3';
   const PALETA = ['#4f46e5', '#0284c7', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#334155'];
   let corSelecionada = PALETA[0];
 
@@ -175,7 +176,7 @@
     { id: 'm5', nome: 'Ciências', cor: '#059669' }
   ];
 
-  let estado = {
+  let estado = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
     turmaAtual: 't1',
     turmas: {
       t1: {
@@ -193,30 +194,45 @@
     st.textContent = 'Sincronizando...';
     try {
       const resp = await fetch(FIREBASE_URL);
-      if (!resp.ok) throw new Error('Bloqueado');
+      if (resp.status === 401 || resp.status === 403) {
+        st.textContent = '🔒 Bloqueado no Firebase';
+        renderizarTudo();
+        return;
+      }
+      if (!resp.ok) throw new Error('Erro de rede');
       const dadosNuvem = await resp.json();
       if (dadosNuvem && dadosNuvem.turmas) {
         estado = dadosNuvem;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+      } else if (estado.turmas.t1.alunos.length > 0) {
+        await salvarDados();
       }
       st.textContent = '☁️ Conectado';
     } catch (e) {
-      st.textContent = '⚠️ Offline (Verifique Regras)';
+      st.textContent = '💾 Salvo local (Rede bloqueou nuvem)';
     }
     renderizarTudo();
   }
 
   async function salvarDados(msgToast = '') {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
     const st = document.getElementById('status-save');
     st.textContent = 'Salvando...';
     try {
-      await fetch(FIREBASE_URL, {
+      const resp = await fetch(FIREBASE_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(estado)
       });
-      st.textContent = '☁️ Salvo na nuvem';
+      if (resp.status === 401 || resp.status === 403) {
+        st.textContent = '🔒 Salvo local (Libere Regras)';
+      } else if (!resp.ok) {
+        throw new Error('Falha');
+      } else {
+        st.textContent = '☁️ Salvo na nuvem';
+      }
     } catch (e) {
-      st.textContent = '⚠️ Erro ao salvar';
+      st.textContent = '💾 Salvo apenas neste aparelho';
     }
     if (msgToast) mostrarToast(msgToast);
   }
@@ -458,7 +474,7 @@
     if (turma.materias.length <= 1) return mostrarToast('A turma precisa ter pelo menos uma matéria.');
     if (!confirm('Excluir esta matéria e todas as suas notas?')) return;
     turma.materias = turma.materias.filter(m => m.id !== turma.materiaAtual);
-    turma.materiaAtual = turma.materias[0].id;
+    turma.materiaAtual = turma.materias.id;
     salvarDados('Matéria excluída.');
     renderizarTudo();
   }
@@ -494,3 +510,4 @@
 </script>
 </body>
 </html>
+
