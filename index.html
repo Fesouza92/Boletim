@@ -121,5 +121,279 @@
         <button type="button" class="btn-d" onclick="limparTurma()">🗑️ Limpar Turma</button>
       </div>
     </div>
+    const STORAGE_KEY = 'boletim_pro_v6';
+const CORES = ['#2563eb','#059669','#d97706','#0891b2','#7c3aed','#db2777','#dc2626','#4f46e5','#0d9488'];
+const MAT_PADRAO = [
+{ id: 'portugues', nome: 'Português', icone: '📖', cor: '#2563eb' },
+{ id: 'ciencias', nome: 'Ciências', icone: '🔬', cor: '#059669' },
+{ id: 'matematica', nome: 'Matemática', icone: '📐', cor: '#d97706' },
+{ id: 'geografia', nome: 'Geografia', icone: '🌍', cor: '#0891b2' },
+{ id: 'historia', nome: 'História', icone: '🏛️', cor: '#7c3aed' }
+];
+let estado = { corte: 5, turmaAtivaId: 'turma_1', materias: JSON.parse(JSON.stringify(MAT_PADRAO)), turmas: { turma_1: { nome: 'Turma A', alunos: [], notas: {} } } };
+let matAtivaId = 'portugues', corSel = CORES[0];
+const esc = s => String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+function toast(msg) {
+const el = document.getElementById('toast');
+el.textContent = msg; el.classList.add('show');
+clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2800);
+}
+const status = msg => document.getElementById('statusSave').textContent = msg;
+function garantirEstrutura(t) {
+t.alunos = t.alunos || []; t.notas = t.notas || {};
+estado.materias.forEach(m => {
+t.notas[m.id] = t.notas[m.id] || {};
+t.alunos.forEach(a => { t.notas[m.id][a] = t.notas[m.id][a] || { n1:'', n2:'', n3:'', n4:'', rec:'', faltas:'' }; });
+});
+}
+(function init() {
+try {
+const s6 = localStorage.getItem(STORAGE_KEY);
+if (s6) { const d = JSON.parse(s6); if (d?.turmas && Object.keys(d.turmas).length) estado = d; }
+else {
+const s5 = localStorage.getItem('boletim_salvo_v5') || localStorage.getItem('boletim_salvo_v4');
+if (s5) { const a = JSON.parse(s5); estado.corte = Number(a.corte) || 5; estado.turmas.turma_1.alunos = a.alunos || []; estado.turmas.turma_1.notas = a.notas || {}; }
+}
+} catch (e) {}
+if (!estado.turmas[estado.turmaAtivaId]) estado.turmaAtivaId = Object.keys(estado.turmas)[0];
+if (!estado.materias.some(m => m.id === matAtivaId)) matAtivaId = estado.materias[0].id;
+Object.values(estado.turmas).forEach(garantirEstrutura);
+})();
+function salvar() {
+try {
+localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+status('💾 Salvo às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+} catch (e) { status('⚠️ Erro ao salvar'); }
+}
+const turmaAtual = () => estado.turmas[estado.turmaAtivaId];
+function renderTurmas() {
+document.getElementById('selTurma').innerHTML = Object.entries(estado.turmas)
+.map(([id, t]) => <option value="${id}" ${id === estado.turmaAtivaId ? 'selected' : ''}>${esc(t.nome)}</option>).join('');
+}
+function trocarTurma(id) { estado.turmaAtivaId = id; garantirEstrutura(turmaAtual()); salvar(); atualizarUI(); }
+function novaTurma() {
+const n = prompt('Nome da nova turma (ex: 6º Ano B):');
+if (!n?.trim()) return;
+const id = 'turma_' + Date.now();
+estado.turmas[id] = { nome: n.trim(), alunos: [], notas: {} };
+estado.turmaAtivaId = id; garantirEstrutura(estado.turmas[id]);
+salvar(); renderTurmas(); atualizarUI(); toast(✅ Turma "${n.trim()}" criada!);
+}
+function renomearTurma() {
+const t = turmaAtual(), n = prompt('Novo nome da turma:', t.nome);
+if (!n?.trim()) return;
+t.nome = n.trim(); salvar(); renderTurmas(); toast('✏️ Turma renomeada.');
+}
+function excluirTurma() {
+if (Object.keys(estado.turmas).length <= 1) return toast('⚠️ Mantenha ao menos uma turma.');
+const t = turmaAtual();
+if (!confirm(Excluir a turma "${t.nome}"?)) return;
+delete estado.turmas[estado.turmaAtivaId];
+estado.turmaAtivaId = Object.keys(estado.turmas)[0];
+salvar(); renderTurmas(); atualizarUI(); toast('🗑️ Turma excluída.');
+}
+function renderAbas() {
+document.getElementById('listaAbas').innerHTML = estado.materias.map(m =>
+<button type="button" class="tab ${m.id === matAtivaId ? 'ativa' : ''}" onclick="mudarMat('${m.id}')">${m.icone} ${esc(m.nome)}</button>
+).join('');
+const m = estado.materias.find(x => x.id === matAtivaId) || estado.materias[0];
+document.documentElement.style.setProperty('--cor', m.cor);
+document.getElementById('tit').textContent = ${m.icone} ${m.nome};
+document.getElementById('btnDelMat').style.display = estado.materias.length > 1 ? 'inline-flex' : 'none';
+}
+function mudarMat(id) { matAtivaId = id; renderAbas(); if (turmaAtual().alunos.length) desenhar(); }
+function abrirModalMat() {
+document.getElementById('nomeNovaMat').value = '';
+document.getElementById('coresGrid').innerHTML = CORES.map(c =>
+<div class="cor-opt ${c === corSel ? 'sel' : ''}" style="background:${c}" onclick="corSel='${c}';document.querySelectorAll('.cor-opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')"></div>
+).join('');
+document.getElementById('modalMat').style.display = 'flex';
+document.getElementById('nomeNovaMat').focus();
+}
+function salvarNovaMateria() {
+const nome = document.getElementById('nomeNovaMat').value.trim();
+if (!nome) return toast('⚠️ Digite o nome da matéria.');
+const id = 'mat_' + Date.now();
+estado.materias.push({ id, nome, icone: '📘', cor: corSel });
+Object.values(estado.turmas).forEach(garantirEstrutura);
+matAtivaId = id; salvar(); renderAbas();
+if (turmaAtual().alunos.length) desenhar();
+fecharModal('modalMat'); toast(📘 "${nome}" adicionada!);
+}
+function removerMateriaAtual() {
+if (estado.materias.length <= 1) return;
+const m = estado.materias.find(x => x.id === matAtivaId);
+if (!confirm(Remover "${m.nome}" de todas as turmas?)) return;
+estado.materias = estado.materias.filter(x => x.id !== matAtivaId);
+Object.values(estado.turmas).forEach(t => delete t.notas[matAtivaId]);
+matAtivaId = estado.materias[0].id; salvar(); renderAbas();
+if (turmaAtual().alunos.length) desenhar();
+toast('🗑️ Matéria removida.');
+}
+function mudarCorte() {
+const v = parseFloat(document.getElementById('corte').value);
+estado.corte = isNaN(v) ? 5 : Math.min(10, Math.max(1, v));
+document.getElementById('corte').value = estado.corte;
+salvar(); if (turmaAtual().alunos.length) desenhar();
+}
+function carregar() {
+const linhas = document.getElementById('txt').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+if (!linhas.length) return toast('⚠️ Cole pelo menos um nome.');
+const t = turmaAtual();
+t.alunos = [...new Set(linhas)];
+estado.materias.forEach(m => {
+const novo = {};
+t.alunos.forEach(a => novo[a] = t.notas[m.id]?.[a] || { n1:'', n2:'', n3:'', n4:'', rec:'', faltas:'' });
+t.notas[m.id] = novo;
+});
+salvar(); atualizarUI(); toast(✅ ${t.alunos.length} aluno(s) carregado(s)!);
+}
+function limparTurma() {
+const t = turmaAtual();
+if (!confirm(Apagar alunos e notas de "${t.nome}"?)) return;
+t.alunos = []; t.notas = {}; garantirEstrutura(t);
+salvar(); atualizarUI(); toast('🗑️ Turma limpa.');
+}
+function obterInfo(o) {
+const bim = [o.n1, o.n2, o.n3, o.n4].filter(x => x !== '' && x != null).map(Number);
+if (!bim.length) return { med: null, sit: '-', cls: 'badge neutro', ok: false, rec: false };
+let calc = [...bim], usouRec = false;
+if (calc.length === 4 && o.rec !== '' && o.rec != null) {
+const r = Number(o.rec), min = Math.min(...calc);
+if (r > min) { calc[calc.indexOf(min)] = r; usouRec = true; }
+}
+const med = (calc.reduce((a, b) => a + b, 0) / calc.length).toFixed(1);
+if (bim.length < 4) return { med, sit: Parcial (${bim.length}/4), cls: 'badge amar', ok: false, rec: false };
+const ap = parseFloat(med) >= estado.corte;
+return { med, sit: ap ? 'Aprovado' : 'Reprovado', cls: ap ? 'badge azul' : 'badge verm', ok: true, rec: usouRec };
+}
+function atualizarResumo() {
+const t = turmaAtual();
+let ap = 0, rp = 0, and = 0;
+t.alunos.forEach(a => {
+const i = obterInfo(t.notas[matAtivaId]?.[a] || {});
+if (i.med !== null) { if (!i.ok) and++; else parseFloat(i.med) >= estado.corte ? ap++ : rp++; }
+});
+document.getElementById('resumo').innerHTML = t.alunos.length
+? <span class="pill">Total: ${t.alunos.length}</span><span class="pill ap">Aprovados: ${ap}</span><span class="pill rp">Reprovados: ${rp}</span><span class="pill and">Em andamento: ${and}</span> : '';
+}
+function calc(idx, k, val) {
+const t = turmaAtual(), a = t.alunos[idx];
+if (k === 'faltas') {
+const f = val === '' ? '' : Math.max(0, parseInt(val, 10));
+t.notas[matAtivaId][a].faltas = isNaN(f) ? '' : f;
+return salvar();
+}
+const n = val === '' ? '' : Math.min(10, Math.max(0, parseFloat(val)));
+t.notas[matAtivaId][a][k] = isNaN(n) ? '' : n;
+salvar();
+const i = obterInfo(t.notas[matAtivaId][a]);
+const elM = document.getElementById('m-' + idx), elS = document.getElementById('s-' + idx);
+elM.textContent = i.med !== null ? (i.rec ? ${i.med} * : i.med) : '-'; elM.className = i.cls;
+elS.textContent = i.sit; elS.className = i.cls;
+atualizarResumo();
+}
+function desenhar() {
+const t = turmaAtual(), tab = document.getElementById('tab');
+if (!t.alunos.length) {
+tab.className = 'empty';
+tab.innerHTML = 'Cole os nomes acima e clique em Atualizar Lista.';
+document.getElementById('resumo').innerHTML = '';
+return;
+}
+let h = 'Aluno1º Bim2º Bim3º Bim4º BimRecup.FaltasMédiaSituação';
+t.alunos.forEach((a, idx) => {
+const o = t.notas[matAtivaId][a] || {}, i = obterInfo(o);
+h += <tr><td><strong>${esc(a)}</strong></td> +
+['n1','n2','n3','n4'].map(k => <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${o[k]??''}" oninput="calc(${idx},'${k}',this.value)"></td>).join('') +
+<td><input type="number" class="nota rec" step="0.1" min="0" max="10" value="${o.rec??''}" oninput="calc(${idx},'rec',this.value)"></td> +
+<td><input type="number" class="nota falta" step="1" min="0" value="${o.faltas??''}" oninput="calc(${idx},'faltas',this.value)"></td> +
+<td><span id="m-${idx}" class="${i.cls}">${i.med !== null ? (i.rec ? i.med+' *' : i.med) : '-'}</span></td> +
+<td><span id="s-${idx}" class="${i.cls}">${i.sit}</span></td></tr>;
+});
+tab.className = 'tab-wrap';
+tab.innerHTML = h + '';
+atualizarResumo();
+}
+function atualizarUI() {
+const t = turmaAtual();
+document.getElementById('corte').value = estado.corte;
+document.getElementById('txt').value = t.alunos.join('\n');
+document.getElementById('contAlunos').textContent = ${t.alunos.length} aluno(s);
+renderAbas(); desenhar();
+}
+function aplicarBackup(txt) {
+const d = JSON.parse(txt.trim().replace(/^\uFEFF/, ''));
+if (d.turmas) estado = d;
+else if (Array.isArray(d.alunos)) {
+const id = 'turma_' + Date.now();
+estado.turmas[id] = { nome: 'Turma Importada', alunos: d.alunos, notas: d.notas || {} };
+estado.turmaAtivaId = id;
+if (d.corte) estado.corte = Number(d.corte);
+} else throw new Error('Formato inválido');
+Object.values(estado.turmas).forEach(garantirEstrutura);
+if (!estado.turmas[estado.turmaAtivaId]) estado.turmaAtivaId = Object.keys(estado.turmas)[0];
+if (!estado.materias.some(m => m.id === matAtivaId)) matAtivaId = estado.materias[0].id;
+salvar(); renderTurmas(); atualizarUI(); status('☁️ Restaurado!'); toast('✅ Backup restaurado!');
+}
+function exportarBackup() {
+const blob = new Blob([JSON.stringify(estado, null, 2)], { type: 'application/json;charset=utf-8' });
+const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+a.download = backup_boletim_${new Date().toISOString().slice(0,10)}.json;
+a.click(); toast('☁️ Backup salvo!');
+}
+function importarBackup(e) {
+const f = e.target.files[0]; if (!f) return;
+const r = new FileReader();
+r.onload = ev => { try { aplicarBackup(ev.target.result); } catch (err) { alert('Erro: ' + err.message); } e.target.value = ''; };
+r.readAsText(f, 'UTF-8');
+}
+function abrirModalTexto() { document.getElementById('txtBackup').value = JSON.stringify(estado); document.getElementById('modalBackup').style.display = 'flex'; }
+const fecharModal = id => document.getElementById(id).style.display = 'none';
+function copiarTextoBackup() {
+const el = document.getElementById('txtBackup'); el.select(); el.setSelectionRange(0, 999999);
+try { document.execCommand('copy'); navigator.clipboard?.writeText(el.value).catch(()=>{}); toast('📋 Código copiado!'); }
+catch (e) { toast('⚠️ Pressione Ctrl+C para copiar.'); }
+}
+function restaurarTextoBackup() {
+try { aplicarBackup(document.getElementById('txtBackup').value); fecharModal('modalBackup'); }
+catch (e) { alert('Código inválido.'); }
+}
+function baixarExcel() {
+const t = turmaAtual();
+if (!t.alunos.length) return toast('⚠️ Adicione alunos primeiro.');
+let xml = '' +
+'';
+xml += '' + estado.materias.map(() => '').join('') +
+<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno (${esc(t.nome)})</Data></Cell> + estado.materias.map(m => <Cell ss:StyleID="h"><Data ss:Type="String">${esc(m.nome)}</Data></Cell>).join('') + '';
+t.alunos.forEach(a => {
+xml += <Row><Cell><Data ss:Type="String">${esc(a)}</Data></Cell>;
+estado.materias.forEach(m => {
+const i = obterInfo(t.notas[m.id]?.[a] || {});
+const st = i.sit === 'Reprovado' ? ' ss:StyleID="rp"' : (i.sit === 'Aprovado' ? ' ss:StyleID="ap"' : (i.med !== null ? ' ss:StyleID="and"' : ''));
+xml += i.med !== null ? <Cell${st}><Data ss:Type="Number">${Number(i.med)}</Data></Cell> : '-';
+});
+xml += '';
+});
+xml += '';
+estado.materias.forEach(m => {
+const aba = m.nome.replace(/[\/?*[]:]/g, '').slice(0, 30);
+xml += <Worksheet ss:Name="${esc(aba)}"><Table><Column ss:Width="190"/><Column ss:Width="60"/><Column ss:Width="60"/><Column ss:Width="60"/><Column ss:Width="60"/><Column ss:Width="65"/><Column ss:Width="60"/><Column ss:Width="75"/><Column ss:Width="110"/> +
+'Aluno1º Bim2º Bim3º Bim4º BimRecup.FaltasMédiaSituação';
+t.alunos.forEach(a => {
+const o = t.notas[m.id]?.[a] || {}, i = obterInfo(o);
+const st = i.sit === 'Reprovado' ? ' ss:StyleID="rp"' : (i.sit === 'Aprovado' ? ' ss:StyleID="ap"' : (i.med !== null ? ' ss:StyleID="and"' : ''));
+const cel = v => (v === '' || v == null) ? '' : <Cell><Data ss:Type="Number">${Number(v)}</Data></Cell>;
+xml += <Row><Cell><Data ss:Type="String">${esc(a)}</Data></Cell>${cel(o.n1)}${cel(o.n2)}${cel(o.n3)}${cel(o.n4)}${cel(o.rec)}${cel(o.faltas)} +
+(i.med !== null ? <Cell><Data ss:Type="Number">${Number(i.med)}</Data></Cell> : '-') + <Cell${st}><Data ss:Type="String">${i.sit}</Data></Cell></Row>;
+});
+xml += '';
+});
+const blob = new Blob([xml + ''], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+a.download = boletim_${t.nome.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.xls; a.click();
+toast('📥 Planilha Excel gerada!');
+}
+window.onload = () => { renderTurmas(); atualizarUI(); if (turmaAtual().alunos.length) status('✅ Dados carregados'); };
     <div class="abas-wrap">
       <div class="abas" id="listaAbas"></div>
