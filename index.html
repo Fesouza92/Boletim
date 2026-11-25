@@ -163,22 +163,26 @@
 
 <div class="toast" id="toast"></div>
 <script>
-  const STORAGE_KEY = 'boletim_escolar_pro_v1';
+    const STORAGE_KEY = 'boletim_escolar_pro_v2';
   const PALETA = ['#4f46e5', '#0284c7', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#334155'];
   let corSelecionada = PALETA[0];
+
+  const MATERIAS_PADRAO = () => [
+    { id: 'm1', nome: 'Português', cor: '#0284c7' },
+    { id: 'm2', nome: 'Matemática', cor: '#4f46e5' },
+    { id: 'm3', nome: 'História', cor: '#d97706' },
+    { id: 'm4', nome: 'Geografia', cor: '#7c3aed' },
+    { id: 'm5', nome: 'Ciências', cor: '#059669' }
+  ];
 
   let estado = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
     turmaAtual: 't1',
     turmas: {
       t1: {
-        nome: '9º Ano A',
+        nome: '4º D',
         corte: 6.0,
         materiaAtual: 'm1',
-        materias: [
-          { id: 'm1', nome: 'Matemática', cor: '#4f46e5' },
-          { id: 'm2', nome: 'Português', cor: '#0284c7' },
-          { id: 'm3', nome: 'Ciências', cor: '#059669' }
-        ],
+        materias: MATERIAS_PADRAO(),
         alunos: []
       }
     }
