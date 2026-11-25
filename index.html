@@ -487,3 +487,40 @@
     salvarDados('Turma limpa.');
     renderizarTudo();
   }
+  function exportarBackup() {
+    const dados = JSON.stringify(estado, null, 2);
+    const blob = new Blob([dados], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    const dataHoje = new Date().toISOString().slice(0, 10);
+    link.download = `Backup_Boletim_${dataHoje}.json`;
+    link.click();
+    mostrarToast('Backup salvo! Envie o arquivo para o outro aparelho.');
+  }
+
+  function importarBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const importado = JSON.parse(e.target.result);
+        if (importado && importado.turmas) {
+          estado = importado;
+          salvarDados('Dados restaurados com sucesso!');
+          renderizarTudo();
+        } else {
+          mostrarToast('Arquivo de backup inválido.');
+        }
+      } catch (err) {
+        mostrarToast('Erro ao ler o arquivo.');
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  carregarDaNuvem();
+</script>
+</body>
+</html>
