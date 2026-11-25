@@ -116,6 +116,71 @@
         <button class="btn-p" onclick="adicionarAlunos()">+ Adicionar Alunos</button>
         <button class="btn-e" onclick="exportarExcel()">📊 Exportar Excel</button>
         <button class="btn-s" onclick="window.print()">🖨️ Imprimir</button>
+          async function exportarExcel() {
+    const turma = getTurma();
+    if (!turma.alunos || !turma.alunos.length) return mostrarToast('Não há dados para exportar.');
+
+    if (typeof XLSX === 'undefined') {
+      mostrarToast('Carregando gerador de Excel...');
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cloudflare.com';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      }).catch(() => {});
+    }
+
+    if (typeof XLSX === 'undefined') {
+      return mostrarToast('Rede bloqueou o Excel. Tente em outra rede ou use Baixar Backup.');
+    }
+
+    const wb = XLSX.utils.book_new();
+    const nomesUsados = new Set();
+
+    turma.materias.forEach((mat, index) => {
+      const linhas = [
+        ['Turma: ' + turma.nome, 'Matéria: ' + mat.nome, 'Corte: ' + turma.corte],
+        [],
+        ['Aluno', '1º Bim', '2º Bim', '3º Bim', '4º Bim', 'Recuperação', 'Faltas', 'Média', 'Situação']
+      ];
+
+      turma.alunos.forEach(a => {
+        const n = (a.notas && a.notas[mat.id]) || { b1: '', b2: '', b3: '', b4: '', rec: '', faltas: 0 };
+        const res = calcularDesempenho(n, turma.corte);
+        linhas.push([
+          a.nome,
+          n.b1 !== '' ? Number(n.b1) : '',
+          n.b2 !== '' ? Number(n.b2) : '',
+          n.b3 !== '' ? Number(n.b3) : '',
+          n.b4 !== '' ? Number(n.b4) : '',
+          n.rec !== '' ? Number(n.rec) : '',
+          Number(n.faltas || 0),
+          res.media !== null ? Number(res.media) : '-',
+          res.status
+        ]);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(linhas);
+      ws['!cols'] = [{ wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 14 }];
+
+      let nomeAba = mat.nome.replace(/[\\\/\?\*\[\]:]/g, '').trim().slice(0, 31) || ('Materia_' + (index + 1));
+      let baseAba = nomeAba;
+      let contador = 2;
+      while (nomesUsados.has(nomeAba.toLowerCase())) {
+        const sufixo = ' (' + (contador++) + ')';
+        nomeAba = baseAba.slice(0, 31 - sufixo.length) + sufixo;
+      }
+      nomesUsados.add(nomeAba.toLowerCase());
+
+      XLSX.utils.book_append_sheet(wb, ws, nomeAba);
+    });
+
+    const nomeArquivo = ('Boletim_' + turma.nome + '.xlsx').replace(/\s+/g, '_');
+    XLSX.writeFile(wb, nomeArquivo);
+    mostrarToast('Excel gerado com todas as matérias nas abas!');
+  }
+
         <button class="btn-s" onclick="exportarBackup()">💾 Baixar Backup</button>
         <button class="btn-s" onclick="document.getElementById('input-backup').click()">📂 Carregar Backup</button>
         <input type="file" id="input-backup" accept=".json" style="display:none" onchange="importarBackup(event)">
