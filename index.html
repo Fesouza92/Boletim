@@ -4,11 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Boletim Escolar Pro</title>
-<link href="https://googleapis.com" rel="stylesheet">
-<script src="https://sheetjs.com"></script>
 <style>
   :root { --cor: #4f46e5; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --muted: #64748b; --border: #e2e8f0; }
-  * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
   body { background: radial-gradient(circle at top left, #eef2ff, #f8fafc 45%); margin: 0; padding: 24px 16px; color: var(--text); min-height: 100vh; }
   .box { max-width: 1180px; margin: 0 auto; background: var(--card); border-radius: 24px; box-shadow: 0 20px 40px -15px rgba(15,23,42,.1); overflow: hidden; border: 1px solid rgba(226,232,240,.9); }
   .topo { background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 50%, #3730a3 100%); color: #fff; padding: 28px 34px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
@@ -489,95 +487,3 @@
     salvarDados('Turma limpa.');
     renderizarTudo();
   }
-
-  function exportarExcel() {
-    const turma = getTurma();
-    if (!turma.alunos || !turma.alunos.length) return mostrarToast('Não há dados para exportar.');
-    if (typeof XLSX === 'undefined') return mostrarToast('Biblioteca Excel indisponível (verifique a internet).');
-
-    const wb = XLSX.utils.book_new();
-    const nomesUsados = new Set();
-
-    turma.materias.forEach((mat, index) => {
-      const linhas = [
-        [`Turma: ${turma.nome}`, `Matéria: ${mat.nome}`, `Nota de Corte: ${turma.corte}`],
-        [],
-        ['Aluno', '1º Bim', '2º Bim', '3º Bim', '4º Bim', 'Recuperação', 'Faltas', 'Média', 'Situação']
-      ];
-
-      turma.alunos.forEach(a => {
-        const n = (a.notas && a.notas[mat.id]) || { b1: '', b2: '', b3: '', b4: '', rec: '', faltas: 0 };
-        const res = calcularDesempenho(n, turma.corte);
-        linhas.push([
-          a.nome,
-          n.b1 !== '' ? Number(n.b1) : '',
-          n.b2 !== '' ? Number(n.b2) : '',
-          n.b3 !== '' ? Number(n.b3) : '',
-          n.b4 !== '' ? Number(n.b4) : '',
-          n.rec !== '' ? Number(n.rec) : '',
-          Number(n.faltas || 0),
-          res.media !== null ? Number(res.media) : '-',
-          res.status
-        ]);
-      });
-
-      const ws = XLSX.utils.aoa_to_sheet(linhas);
-      ws['!cols'] = [
-        { wch: 32 }, { wch: 9 }, { wch: 9 }, { wch: 9 },
-        { wch: 9 }, { wch: 13 }, { wch: 9 }, { wch: 9 }, { wch: 15 }
-      ];
-
-      let nomeAba = mat.nome.replace(/[\\\/\?\*\[\]:]/g, '').trim().slice(0, 31) || `Materia_${index + 1}`;
-      let baseAba = nomeAba;
-      let contador = 2;
-      while (nomesUsados.has(nomeAba.toLowerCase())) {
-        const sufixo = ` (${contador++})`;
-        nomeAba = baseAba.slice(0, 31 - sufixo.length) + sufixo;
-      }
-      nomesUsados.add(nomeAba.toLowerCase());
-
-      XLSX.utils.book_append_sheet(wb, ws, nomeAba);
-    });
-
-    const nomeArquivo = `Boletim_${turma.nome}.xlsx`.replace(/\s+/g, '_');
-    XLSX.writeFile(wb, nomeArquivo);
-    mostrarToast('Planilha Excel gerada com todas as matérias!');
-  }
-
-  function exportarBackup() {
-    const dados = JSON.stringify(estado, null, 2);
-    const blob = new Blob([dados], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    const dataHoje = new Date().toISOString().slice(0, 10);
-    link.download = `Backup_Boletim_${dataHoje}.json`;
-    link.click();
-    mostrarToast('Backup salvo! Envie o arquivo para o outro aparelho.');
-  }
-
-  function importarBackup(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const importado = JSON.parse(e.target.result);
-        if (importado && importado.turmas) {
-          estado = importado;
-          salvarDados('Dados restaurados com sucesso!');
-          renderizarTudo();
-        } else {
-          mostrarToast('Arquivo de backup inválido.');
-        }
-      } catch (err) {
-        mostrarToast('Erro ao ler o arquivo.');
-      }
-      event.target.value = '';
-    };
-    reader.readAsText(file);
-  }
-
-  carregarDaNuvem();
-</script>
-</body>
-</html>
