@@ -35,7 +35,7 @@
   .btn-d { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; margin-left: auto; } .btn-d:hover { background: #fee2e2; }
   .corte-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #475569; background: #fff; padding: 6px 12px; border-radius: 11px; border: 1px solid #cbd5e1; }
   .corte-box input { width: 50px; padding: 3px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-weight: 700; color: #0f172a; }
-    .abas-wrap { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #f1f5f9; padding: 7px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 22px; }
+  .abas-wrap { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #f1f5f9; padding: 7px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 22px; }
   .abas { display: flex; gap: 6px; flex-wrap: wrap; }
   .tab { background: transparent; color: #475569; padding: 9px 15px; border-radius: 11px; font-weight: 600; }
   .tab:hover { background: rgba(255,255,255,.7); color: #0f172a; }
@@ -117,6 +117,9 @@
         <button class="btn-p" onclick="adicionarAlunos()">+ Adicionar Alunos</button>
         <button class="btn-e" onclick="exportarCSV()">⬇ Exportar CSV</button>
         <button class="btn-s" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn-s" onclick="exportarBackup()">💾 Baixar Backup</button>
+        <button class="btn-s" onclick="document.getElementById('input-backup').click()">📂 Carregar Backup</button>
+        <input type="file" id="input-backup" accept=".json" style="display:none" onchange="importarBackup(event)">
         <div class="corte-box">
           <span>Nota de Corte:</span>
           <input type="number" id="nota-corte" step="0.5" min="0" max="10" value="6" onchange="atualizarCorte()">
@@ -474,7 +477,7 @@
     if (turma.materias.length <= 1) return mostrarToast('A turma precisa ter pelo menos uma matéria.');
     if (!confirm('Excluir esta matéria e todas as suas notas?')) return;
     turma.materias = turma.materias.filter(m => m.id !== turma.materiaAtual);
-    turma.materiaAtual = turma.materias.id;
+    turma.materiaAtual = turma.materias[0].id;
     salvarDados('Matéria excluída.');
     renderizarTudo();
   }
@@ -506,8 +509,40 @@
     mostrarToast('Planilha CSV exportada!');
   }
 
+  function exportarBackup() {
+    const dados = JSON.stringify(estado, null, 2);
+    const blob = new Blob([dados], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    const dataHoje = new Date().toISOString().slice(0, 10);
+    link.download = `Backup_Boletim_${dataHoje}.json`;
+    link.click();
+    mostrarToast('Backup salvo! Envie o arquivo para o outro aparelho.');
+  }
+
+  function importarBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const importado = JSON.parse(e.target.result);
+        if (importado && importado.turmas) {
+          estado = importado;
+          salvarDados('Dados restaurados com sucesso!');
+          renderizarTudo();
+        } else {
+          mostrarToast('Arquivo de backup inválido.');
+        }
+      } catch (err) {
+        mostrarToast('Erro ao ler o arquivo.');
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
   carregarDaNuvem();
 </script>
 </body>
 </html>
-
