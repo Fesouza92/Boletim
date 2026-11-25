@@ -8,54 +8,72 @@
     :root { --cor: #2563eb; }
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background: #eef2f6; margin: 0; padding: 24px 16px; color: #1e293b; }
-    .box { max-width: 1000px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(15,23,42,.07); overflow: hidden; }
-    .topo { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; padding: 24px 28px; }
+    .box { max-width: 1050px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(15,23,42,.07); overflow: hidden; }
+    .topo { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; padding: 24px 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
     .topo h1 { margin: 0; font-size: 22px; }
     .topo p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+    .status-save { background: rgba(255,255,255,.15); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .corpo { padding: 24px 28px; }
     textarea { width: 100%; height: 80px; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; resize: vertical; }
     textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px #dbeafe; }
-    .acoes { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 24px; }
-    button { cursor: pointer; border: none; padding: 10px 16px; border-radius: 9px; font-weight: 600; font-size: 13.5px; transition: .15s; }
+    .acoes { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 24px; align-items: center; }
+    button { cursor: pointer; border: none; padding: 10px 15px; border-radius: 9px; font-weight: 600; font-size: 13.5px; transition: .15s; }
     .btn-p { background: #2563eb; color: #fff; } .btn-p:hover { background: #1d4ed8; }
     .btn-e { background: #16a34a; color: #fff; } .btn-e:hover { background: #15803d; }
+    .btn-s { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; } .btn-s:hover { background: #e2e8f0; }
     .btn-d { background: #fee2e2; color: #dc2626; margin-left: auto; } .btn-d:hover { background: #fecaca; }
+    .config-corte { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #475569; background: #f8fafc; padding: 6px 12px; border-radius: 9px; border: 1px solid #e2e8f0; }
+    .config-corte input { width: 54px; padding: 4px; }
     .abas { display: flex; gap: 8px; flex-wrap: wrap; background: #f8fafc; padding: 8px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
     .tab { background: transparent; color: #475569; padding: 8px 14px; border-radius: 8px; }
     .tab:hover { background: #e2e8f0; }
     .tab.ativa { background: var(--cor); color: #fff; }
     .barra-mat { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
     .barra-mat h2 { margin: 0; font-size: 19px; color: var(--cor); }
-    .resumo { display: flex; gap: 10px; font-size: 12.5px; font-weight: 600; }
+    .resumo { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12.5px; font-weight: 600; }
     .pill { padding: 5px 12px; border-radius: 20px; background: #f1f5f9; color: #475569; }
     .pill.ap { background: #dcfce7; color: #15803d; }
     .pill.rp { background: #fee2e2; color: #b91c1c; }
+    .pill.and { background: #fef3c7; color: #b45309; }
     .tab-wrap { border: 1px solid #e2e8f0; border-radius: 12px; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 620px; }
     th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; padding: 12px; border-bottom: 1px solid #e2e8f0; }
     td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 14px; }
     tr:hover td { background: #f8fafc; }
     th:first-child, td:first-child { text-align: left; padding-left: 16px; }
-    input { width: 66px; padding: 7px; border: 1.5px solid #cbd5e1; border-radius: 7px; text-align: center; font-weight: 600; font-size: 14px; }
-    input:focus { outline: none; border-color: var(--cor); }
+    input[type="number"] { width: 66px; padding: 7px; border: 1.5px solid #cbd5e1; border-radius: 7px; text-align: center; font-weight: 600; font-size: 14px; }
+    input[type="number"]:focus { outline: none; border-color: var(--cor); }
     .badge { font-weight: 700; padding: 5px 11px; border-radius: 20px; display: inline-block; font-size: 12.5px; min-width: 48px; }
     .azul { background: #dbeafe; color: #1d4ed8; }
     .verm { background: #fee2e2; color: #dc2626; }
+    .amar { background: #fef3c7; color: #b45309; }
+    @media (max-width: 640px) { .btn-d { margin-left: 0; } }
   </style>
 </head>
 <body>
 <div class="box">
   <div class="topo">
-    <h1>📚 Boletim & Controle de Notas</h1>
-    <p>Gerencie as notas por disciplina, acompanhe aprovações e exporte em abas separadas para Excel</p>
+    <div>
+      <h1>📚 Boletim & Controle de Notas</h1>
+      <p>Progresso salvo automaticamente no aparelho ou via arquivo para trocar entre PC e celular</p>
+    </div>
+    <div class="status-save" id="statusSave">💾 Pronto</div>
   </div>
   <div class="corpo">
     <textarea id="txt" placeholder="Cole os nomes dos alunos aqui (um nome por linha)..."></textarea>
     <div class="acoes">
-      <button type="button" class="btn-p" onclick="carregar()">👥 Carregar Alunos</button>
-      <button type="button" class="btn-e" onclick="baixarExcel()">📥 Exportar Excel (Abas Separadas)</button>
+      <button type="button" class="btn-p" onclick="carregar()">👥 Atualizar Lista</button>
+      <button type="button" class="btn-s" onclick="exportarBackup()" title="Baixa um arquivo para continuar no celular ou outro PC">☁️ Salvar Progresso</button>
+      <button type="button" class="btn-s" onclick="document.getElementById('arqBackup').click()" title="Carrega um arquivo salvo anteriormente">📂 Continuar de Arquivo</button>
+      <input type="file" id="arqBackup" accept=".json" style="display:none" onchange="importarBackup(event)">
+      <button type="button" class="btn-e" onclick="baixarExcel()">📥 Exportar Excel</button>
+      <div class="config-corte">
+        <label for="corte">Média mín.:</label>
+        <input type="number" id="corte" step="0.5" min="1" max="10" value="5" onchange="mudarCorte()">
+      </div>
       <button type="button" class="btn-d" onclick="limpar()">🗑️ Limpar Tudo</button>
     </div>
+
     <div class="abas">
       <button type="button" class="tab ativa" onclick="mudarMat('portugues','#2563eb',this)">📖 Português</button>
       <button type="button" class="tab" onclick="mudarMat('ciencias','#059669',this)">🔬 Ciências</button>
@@ -63,41 +81,97 @@
       <button type="button" class="tab" onclick="mudarMat('geografia','#0891b2',this)">🌍 Geografia</button>
       <button type="button" class="tab" onclick="mudarMat('historia','#7c3aed',this)">🏛️ História</button>
     </div>
+
     <div class="barra-mat">
       <h2 id="tit">📖 Português</h2>
       <div class="resumo" id="resumo"></div>
     </div>
-    <div id="tab" style="padding:32px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:12px">Cole os nomes acima e clique em <strong>Carregar Alunos</strong>.</div>
+
+    <div id="tab" style="padding:32px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:12px">
+      Cole os nomes acima e clique em <strong>Atualizar Lista</strong>.
+    </div>
   </div>
 </div>
+
 <script>
-let mat = 'portugues', alunos = [];
+const STORAGE_KEY = 'boletim_salvo_v5';
+let mat = 'portugues', alunos = [], corte = 5;
 let notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
 const Mat = { portugues:'Português', ciencias:'Ciências', matematica:'Matemática', geografia:'Geografia', historia:'História' };
 
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function mostrarStatus(msg) {
+  const el = document.getElementById('statusSave');
+  el.textContent = msg;
+}
+
 try {
-  const s = localStorage.getItem('boletim_salvo_v4');
-  if (s) { const d = JSON.parse(s); alunos = d.alunos || []; notas = d.notas || notas; }
+  const s = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('boletim_salvo_v4');
+  if (s) {
+    const d = JSON.parse(s);
+    alunos = d.alunos || [];
+    notas = d.notas || notas;
+    corte = d.corte !== undefined ? Number(d.corte) : 5;
+  }
 } catch(e) {}
 
-window.onload = () => { if (alunos.length) { document.getElementById('txt').value = alunos.join('\n'); desenhar(); } };
-function salvar() { try { localStorage.setItem('boletim_salvo_v4', JSON.stringify({ alunos, notas })); } catch(e) {} }
+window.onload = () => {
+  document.getElementById('corte').value = corte;
+  if (alunos.length) {
+    document.getElementById('txt').value = alunos.join('\n');
+    desenhar();
+    mostrarStatus('✅ Dados restaurados');
+  }
+};
+
+function salvar() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ alunos, notas, corte }));
+    const agora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    mostrarStatus(`💾 Salvo às ${agora}`);
+  } catch(e) {
+    mostrarStatus('⚠️ Erro ao salvar no navegador');
+  }
+}
+
+function mudarCorte() {
+  const val = parseFloat(document.getElementById('corte').value);
+  corte = isNaN(val) ? 5 : Math.min(10, Math.max(1, val));
+  document.getElementById('corte').value = corte;
+  salvar();
+  if (alunos.length) desenhar();
+}
 
 function carregar() {
   const linhas = document.getElementById('txt').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   if (!linhas.length) return;
   alunos = [...new Set(linhas)];
-  Object.keys(notas).forEach(m => alunos.forEach(a => { if (!notas[m][a]) notas[m][a] = { n1:'', n2:'', n3:'', n4:'' }; }));
-  salvar(); desenhar();
+  
+  Object.keys(notas).forEach(m => {
+    const novoObj = {};
+    alunos.forEach(a => {
+      novoObj[a] = notas[m][a] || { n1:'', n2:'', n3:'', n4:'' };
+    });
+    notas[m] = novoObj;
+  });
+
+  salvar();
+  desenhar();
 }
 
 function limpar() {
-  if (!confirm('Deseja apagar todos os alunos e notas?')) return;
-  alunos = []; notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
+  if (!confirm('Deseja apagar todos os alunos e notas salvos neste aparelho?')) return;
+  alunos = [];
+  notas = { portugues:{}, ciencias:{}, matematica:{}, geografia:{}, historia:{} };
   document.getElementById('txt').value = '';
   document.getElementById('resumo').innerHTML = '';
+  document.getElementById('tab').style.cssText = 'padding:32px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:12px';
   document.getElementById('tab').innerHTML = 'Lista apagada. Cole novos nomes acima.';
-  try { localStorage.removeItem('boletim_salvo_v4'); } catch(e) {}
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  mostrarStatus('🗑️ Dados apagados');
 }
 
 function mudarMat(m, cor, btn) {
@@ -109,20 +183,33 @@ function mudarMat(m, cor, btn) {
   if (alunos.length) desenhar();
 }
 
-function obterMedia(o) {
-  const l = [o.n1, o.n2, o.n3, o.n4].filter(x => x !== '').map(Number);
-  return l.length ? (l.reduce((a, b) => a + b, 0) / 4).toFixed(1) : null;
+function obterInfo(o) {
+  const l = [o.n1, o.n2, o.n3, o.n4].filter(x => x !== '' && x !== null && x !== undefined).map(Number);
+  if (!l.length) return { med: null, sit: '-', cls: 'badge', completa: false };
+  const med = (l.reduce((a, b) => a + b, 0) / l.length).toFixed(1);
+  const completa = l.length === 4;
+  if (!completa) {
+    return { med, sit: `Parcial (${l.length}/4)`, cls: 'badge amar', completa: false };
+  }
+  const ap = parseFloat(med) >= corte;
+  return { med, sit: ap ? 'Aprovado' : 'Reprovado', cls: ap ? 'badge azul' : 'badge verm', completa: true };
 }
-function obterSit(med) { return med === null ? '-' : (parseFloat(med) < 5 ? 'Reprovado' : 'Aprovado'); }
 
 function atualizarResumo() {
-  let ap = 0, rp = 0;
+  let ap = 0, rp = 0, and = 0;
   alunos.forEach(a => {
-    const med = obterMedia(notas[mat][a] || {});
-    if (med !== null) parseFloat(med) < 5 ? rp++ : ap++;
+    const info = obterInfo(notas[mat][a] || {});
+    if (info.med !== null) {
+      if (!info.completa) and++;
+      else parseFloat(info.med) >= corte ? ap++ : rp++;
+    }
   });
   document.getElementById('resumo').innerHTML = alunos.length
-    ? `<span class="pill">Total: ${alunos.length}</span><span class="pill ap">Aprovados: ${ap}</span><span class="pill rp">Reprovados: ${rp}</span>` : '';
+    ? `<span class="pill">Total: ${alunos.length}</span>` +
+      `<span class="pill ap">Aprovados: ${ap}</span>` +
+      `<span class="pill rp">Reprovados: ${rp}</span>` +
+      `<span class="pill and">Em andamento: ${and}</span>`
+    : '';
 }
 
 function calc(idx, k, val) {
@@ -130,30 +217,62 @@ function calc(idx, k, val) {
   const n = val === '' ? '' : Math.min(10, Math.max(0, parseFloat(val)));
   notas[mat][a][k] = isNaN(n) ? '' : n;
   salvar();
-  const med = obterMedia(notas[mat][a]), sit = obterSit(med);
+  const info = obterInfo(notas[mat][a]);
   const elM = document.getElementById('m-' + idx), elS = document.getElementById('s-' + idx);
-  const cls = med === null ? 'badge' : (parseFloat(med) < 5 ? 'badge verm' : 'badge azul');
-  elM.textContent = med !== null ? med : '-'; elM.className = cls;
-  elS.textContent = sit; elS.className = cls;
+  elM.textContent = info.med !== null ? info.med : '-';
+  elM.className = info.cls;
+  elS.textContent = info.sit;
+  elS.className = info.cls;
   atualizarResumo();
 }
 
 function desenhar() {
   let h = '<div class="tab-wrap"><table><tr><th>Aluno</th><th>Nota 1</th><th>Nota 2</th><th>Nota 3</th><th>Nota 4</th><th>Média</th><th>Situação</th></tr>';
   alunos.forEach((a, idx) => {
-    const o = notas[mat][a], med = obterMedia(o), sit = obterSit(med);
-    const cls = med === null ? 'badge' : (parseFloat(med) < 5 ? 'badge verm' : 'badge azul');
-    h += `<tr><td><strong>${a}</strong></td>` +
+    const o = notas[mat][a], info = obterInfo(o);
+    h += `<tr><td><strong>${esc(a)}</strong></td>` +
       ['n1','n2','n3','n4'].map(k => `<td><input type="number" step="0.1" min="0" max="10" value="${o[k]}" oninput="calc(${idx},'${k}',this.value)"></td>`).join('') +
-      `<td><span id="m-${idx}" class="${cls}">${med !== null ? med : '-'}</span></td>` +
-      `<td><span id="s-${idx}" class="${cls}">${sit}</span></td></tr>`;
+      `<td><span id="m-${idx}" class="${info.cls}">${info.med !== null ? info.med : '-'}</span></td>` +
+      `<td><span id="s-${idx}" class="${info.cls}">${info.sit}</span></td></tr>`;
   });
   document.getElementById('tab').style.cssText = '';
   document.getElementById('tab').innerHTML = h + '</table></div>';
   atualizarResumo();
 }
 
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function exportarBackup() {
+  if (!alunos.length) return alert('Não há alunos ou notas para salvar.');
+  const dados = JSON.stringify({ alunos, notas, corte, data: new Date().toISOString() }, null, 2);
+  const blob = new Blob([dados], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `progresso_boletim_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+function importarBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (!Array.isArray(d.alunos) || typeof d.notas !== 'object') throw new Error('Formato inválido');
+      alunos = d.alunos;
+      notas = d.notas;
+      corte = d.corte !== undefined ? Number(d.corte) : 5;
+      document.getElementById('corte').value = corte;
+      document.getElementById('txt').value = alunos.join('\n');
+      salvar();
+      desenhar();
+      mostrarStatus('☁️ Backup carregado com sucesso!');
+    } catch (err) {
+      alert('Não foi possível ler este arquivo de progresso.');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
 
 function baixarExcel() {
   if (!alunos.length) return alert('Carregue os alunos antes de exportar.');
@@ -161,19 +280,39 @@ function baixarExcel() {
     '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' +
     '<Styles><Style ss:ID="h"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#2563EB" ss:Pattern="Solid"/></Style>' +
     '<Style ss:ID="ap"><Font ss:Bold="1" ss:Color="#1D4ED8"/></Style>' +
-    '<Style ss:ID="rp"><Font ss:Bold="1" ss:Color="#DC2626"/></Style></Styles>';
+    '<Style ss:ID="rp"><Font ss:Bold="1" ss:Color="#DC2626"/></Style>' +
+    '<Style ss:ID="and"><Font ss:Bold="1" ss:Color="#B45309"/></Style></Styles>';
 
+  // Aba de Resumo Geral
+  xml += '<Worksheet ss:Name="Resumo Geral"><Table><Column ss:Width="180"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="90"/>' +
+    '<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno</Data></Cell>' +
+    Object.values(Mat).map(nome => `<Cell ss:StyleID="h"><Data ss:Type="String">${nome}</Data></Cell>`).join('') + '</Row>';
+
+  alunos.forEach(a => {
+    xml += `<Row><Cell><Data ss:Type="String">${esc(a)}</Data></Cell>`;
+    Object.keys(Mat).forEach(m => {
+      const info = obterInfo(notas[m][a] || {});
+      const st = info.sit === 'Reprovado' ? ' ss:StyleID="rp"' : (info.sit === 'Aprovado' ? ' ss:StyleID="ap"' : (info.med !== null ? ' ss:StyleID="and"' : ''));
+      xml += info.med !== null
+        ? `<Cell${st}><Data ss:Type="Number">${Number(info.med)}</Data></Cell>`
+        : '<Cell><Data ss:Type="String">-</Data></Cell>';
+    });
+    xml += '</Row>';
+  });
+  xml += '</Table></Worksheet>';
+
+  // Abas por Disciplina
   Object.keys(Mat).forEach(m => {
-    xml += `<Worksheet ss:Name="${Mat[m]}"><Table><Column ss:Width="180"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="80"/><Column ss:Width="95"/>` +
-      '<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 1</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 2</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 3</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 4</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Média Final</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Situação</Data></Cell></Row>';
+    xml += `<Worksheet ss:Name="${Mat[m]}"><Table><Column ss:Width="180"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="80"/><Column ss:Width="110"/>` +
+      '<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 1</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 2</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 3</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 4</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Média</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Situação</Data></Cell></Row>';
 
     alunos.forEach(a => {
-      const o = notas[m][a] || { n1:'', n2:'', n3:'', n4:'' }, med = obterMedia(o), sit = obterSit(med);
-      const st = sit === 'Reprovado' ? ' ss:StyleID="rp"' : (sit === 'Aprovado' ? ' ss:StyleID="ap"' : '');
+      const o = notas[m][a] || { n1:'', n2:'', n3:'', n4:'' }, info = obterInfo(o);
+      const st = info.sit === 'Reprovado' ? ' ss:StyleID="rp"' : (info.sit === 'Aprovado' ? ' ss:StyleID="ap"' : (info.med !== null ? ' ss:StyleID="and"' : ''));
       const cel = v => v === '' ? '<Cell><Data ss:Type="String"></Data></Cell>' : `<Cell><Data ss:Type="Number">${Number(v)}</Data></Cell>`;
       xml += `<Row><Cell><Data ss:Type="String">${esc(a)}</Data></Cell>${cel(o.n1)}${cel(o.n2)}${cel(o.n3)}${cel(o.n4)}` +
-        (med !== null ? `<Cell><Data ss:Type="Number">${Number(med)}</Data></Cell>` : '<Cell><Data ss:Type="String">-</Data></Cell>') +
-        `<Cell${st}><Data ss:Type="String">${sit}</Data></Cell></Row>`;
+        (info.med !== null ? `<Cell><Data ss:Type="Number">${Number(info.med)}</Data></Cell>` : '<Cell><Data ss:Type="String">-</Data></Cell>') +
+        `<Cell${st}><Data ss:Type="String">${info.sit}</Data></Cell></Row>`;
     });
     xml += '</Table></Worksheet>';
   });
