@@ -318,7 +318,6 @@
       </div>
     `;
   }
-
   function atualizarNota(idxAluno, campo, valor) {
     const turma = getTurma();
     if (valor !== '' && campo !== 'faltas') {
@@ -443,20 +442,27 @@
   }
 
   function exportarCSV() {
-const turma = getTurma();
-if (!turma.alunos.length) return mostrarToast('Não há dados para exportar.');
-const mat = turma.materias.find(m => m.id === turma.materiaAtual);
-let csv = Turma: ${turma.nome} | Materia: ${mat.nome}\nAluno;1 Bim;2 Bim;3 Bim;4 Bim;Recuperacao;Faltas;Media;Situacao\n;
-turma.alunos.forEach(a => {
-const n = a.notas[mat.id] || { b1: '', b2: '', b3: '', b4: '', rec: '', faltas: 0 };
-const res = calcularDesempenho(n, turma.corte);
-csv += ${a.nome};${n.b1};${n.b2};${n.b3};${n.b4};${n.rec};${n.faltas || 0};${res.media || '-'};${res.status}\n;
-});
-const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-const link = document.createElement('a');
-link.href = URL.createObjectURL(blob);
-link.download = Boletim_${turma.nome}_${mat.nome}.csv.replace(/\s+/g, '_');
-link.click();
-mostrarToast('Planilha CSV exportada!');
-}
-renderizarTudo();
+    const turma = getTurma();
+    if (!turma.alunos.length) return mostrarToast('Não há dados para exportar.');
+    const mat = turma.materias.find(m => m.id === turma.materiaAtual);
+    let csv = `Turma: ${turma.nome} | Materia: ${mat.nome}\nAluno;1 Bim;2 Bim;3 Bim;4 Bim;Recuperacao;Faltas;Media;Situacao\n`;
+
+    turma.alunos.forEach(a => {
+      const n = a.notas[mat.id] || { b1: '', b2: '', b3: '', b4: '', rec: '', faltas: 0 };
+      const res = calcularDesempenho(n, turma.corte);
+      csv += `${a.nome};${n.b1};${n.b2};${n.b3};${n.b4};${n.rec};${n.faltas || 0};${res.media || '-'};${res.status}\n`;
+    });
+
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Boletim_${turma.nome}_${mat.nome}.csv`.replace(/\s+/g, '_');
+    link.click();
+    mostrarToast('Planilha CSV exportada!');
+  }
+
+  renderizarTudo();
+</script>
+</body>
+</html>
+
