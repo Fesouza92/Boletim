@@ -6,80 +6,80 @@
 <title>Boletim Escolar Pro</title>
 <link href="https://googleapis.com" rel="stylesheet">
 <style>
-  :root { --cor: #2563eb; --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --muted: #64748b; --border: #e2e8f0; }
+  :root { --cor: #4f46e5; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --muted: #64748b; --border: #e2e8f0; }
   * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-  body { background: var(--bg); margin: 0; padding: 20px 14px; color: var(--text); }
-  .box { max-width: 1180px; margin: 0 auto; background: var(--card); border-radius: 20px; box-shadow: 0 12px 32px rgba(15,23,42,.08); overflow: hidden; border: 1px solid var(--border); }
-  .topo { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%); color: #fff; padding: 24px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
-  .topo h1 { margin: 0; font-size: 22px; font-weight: 800; }
-  .topo p { margin: 4px 0 0; font-size: 13px; color: #cbd5e1; }
-  .topo-controles { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .turma-box { display: flex; align-items: center; background: rgba(255,255,255,.12); padding: 4px 6px 4px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.2); gap: 6px; }
-  .turma-box label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #e2e8f0; }
+  body { background: radial-gradient(circle at top left, #eef2ff, #f8fafc 45%); margin: 0; padding: 24px 16px; color: var(--text); min-height: 100vh; }
+  .box { max-width: 1180px; margin: 0 auto; background: var(--card); border-radius: 24px; box-shadow: 0 20px 40px -15px rgba(15,23,42,.1); overflow: hidden; border: 1px solid rgba(226,232,240,.9); }
+  .topo { background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 50%, #3730a3 100%); color: #fff; padding: 28px 34px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .topo h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .topo p { margin: 4px 0 0; font-size: 13.5px; color: #c7d2fe; }
+  .topo-controles { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .turma-box { display: flex; align-items: center; background: rgba(255,255,255,.1); backdrop-filter: blur(8px); padding: 5px 8px 5px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); gap: 6px; }
+  .turma-box label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #c7d2fe; }
   .turma-box select { background: transparent; color: #fff; border: none; font-weight: 700; font-size: 14px; padding: 4px; cursor: pointer; outline: none; }
   .turma-box select option { color: #0f172a; background: #fff; }
-  .btn-icon { background: rgba(255,255,255,.15); color: #fff; border: none; width: 28px; height: 28px; border-radius: 7px; cursor: pointer; padding: 0; font-size: 14px; }
-  .btn-icon:hover { background: rgba(255,255,255,.3); }
-  .status-save { background: rgba(16,185,129,.2); border: 1px solid rgba(16,185,129,.4); color: #a7f3d0; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; }
-  .corpo { padding: 24px 30px; }
-  .painel { background: #f8fafc; border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 22px; }
-  .painel-head { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: #334155; }
-  textarea { width: 100%; height: 74px; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; resize: vertical; }
-  textarea:focus { outline: none; border-color: var(--cor); }
-  .acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
-  button { cursor: pointer; border: none; padding: 9px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; transition: .15s; display: inline-flex; align-items: center; gap: 5px; }
-  .btn-p { background: #2563eb; color: #fff; } .btn-p:hover { background: #1d4ed8; }
-  .btn-e { background: #10b981; color: #fff; } .btn-e:hover { background: #059669; }
-  .btn-s { background: #fff; color: #334155; border: 1px solid #cbd5e1; } .btn-s:hover { background: #f1f5f9; }
+  .btn-icon { background: rgba(255,255,255,.14); color: #fff; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; padding: 0; font-size: 14px; transition: .15s; }
+  .btn-icon:hover { background: rgba(255,255,255,.28); transform: translateY(-1px); }
+  .status-save { background: rgba(16,185,129,.18); border: 1px solid rgba(52,211,153,.35); color: #6ee7b7; padding: 7px 14px; border-radius: 99px; font-size: 12.5px; font-weight: 600; }
+  .corpo { padding: 28px 34px; }
+  .painel { background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 24px; }
+  .painel-head { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px; font-weight: 700; color: #334155; }
+  textarea { width: 100%; height: 76px; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px; resize: vertical; background: #fff; transition: .15s; }
+  textarea:focus { outline: none; border-color: var(--cor); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+  .acoes { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+  button { cursor: pointer; border: none; padding: 10px 15px; border-radius: 11px; font-weight: 600; font-size: 13px; transition: all .15s ease; display: inline-flex; align-items: center; gap: 6px; }
+  button:active { transform: scale(0.98); }
+  .btn-p { background: #4f46e5; color: #fff; box-shadow: 0 4px 12px rgba(79,70,229,.25); } .btn-p:hover { background: #4338ca; }
+  .btn-e { background: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,.22); } .btn-e:hover { background: #059669; }
+  .btn-s { background: #fff; color: #334155; border: 1px solid #cbd5e1; } .btn-s:hover { background: #f1f5f9; border-color: #94a3b8; }
   .btn-d { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; margin-left: auto; } .btn-d:hover { background: #fee2e2; }
-  .corte-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #475569; background: #fff; padding: 5px 10px; border-radius: 10px; border: 1px solid #cbd5e1; }
-  .corte-box input { width: 50px; padding: 3px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-weight: 700; }
-  .abas-wrap { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #f8fafc; padding: 8px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 20px; }
+  .corte-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #475569; background: #fff; padding: 6px 12px; border-radius: 11px; border: 1px solid #cbd5e1; }
+  .corte-box input { width: 50px; padding: 3px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-weight: 700; color: #0f172a; }
+  .abas-wrap { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #f1f5f9; padding: 7px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 22px; }
   .abas { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tab { background: transparent; color: #475569; padding: 8px 14px; border-radius: 10px; }
-  .tab:hover { background: #e2e8f0; }
-  .tab.ativa { background: var(--cor); color: #fff; }
-  .btn-add { background: #fff; color: #2563eb; border: 1px dashed #93c5fd; padding: 7px 12px; font-size: 12.5px; }
-  .barra-mat { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
-  .mat-tit { display: flex; align-items: center; gap: 8px; }
-  .mat-tit h2 { margin: 0; font-size: 20px; font-weight: 800; color: var(--cor); }
-  .btn-del-mat { background: transparent; color: #94a3b8; padding: 4px 8px; font-size: 12px; }
-  .btn-del-mat:hover { background: #fee2e2; color: #dc2626; }
+  .tab { background: transparent; color: #475569; padding: 9px 15px; border-radius: 11px; font-weight: 600; }
+  .tab:hover { background: rgba(255,255,255,.7); color: #0f172a; }
+  .tab.ativa { background: var(--cor); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,.15); }
+  .btn-add { background: #fff; color: #4f46e5; border: 1px dashed #a5b4fc; padding: 8px 13px; font-size: 12.5px; } .btn-add:hover { background: #eef2ff; }
+  .barra-mat { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .mat-tit { display: flex; align-items: center; gap: 10px; }
+  .mat-tit h2 { margin: 0; font-size: 21px; font-weight: 800; color: var(--cor); letter-spacing: -0.01em; }
+  .btn-del-mat { background: transparent; color: #94a3b8; padding: 5px 9px; font-size: 12px; } .btn-del-mat:hover { background: #fee2e2; color: #dc2626; }
   .resumo { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12.5px; font-weight: 700; }
-  .pill { padding: 5px 12px; border-radius: 99px; background: #f1f5f9; color: #475569; }
+  .pill { padding: 6px 13px; border-radius: 99px; background: #f1f5f9; color: #475569; }
   .pill.ap { background: #dcfce7; color: #15803d; }
   .pill.rp { background: #fee2e2; color: #b91c1c; }
   .pill.and { background: #fef3c7; color: #b45309; }
-  .tab-wrap { border: 1px solid var(--border); border-radius: 14px; overflow: auto; max-height: 550px; }
+  .tab-wrap { border: 1px solid var(--border); border-radius: 16px; overflow: auto; max-height: 550px; box-shadow: 0 2px 8px rgba(15,23,42,.03); }
   table { width: 100%; border-collapse: collapse; min-width: 780px; }
-  th { position: sticky; top: 0; z-index: 5; background: #f8fafc; color: #475569; font-size: 11.5px; text-transform: uppercase; padding: 12px 8px; border-bottom: 1px solid var(--border); }
-  td { padding: 9px 8px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 14px; }
+  th { position: sticky; top: 0; z-index: 5; background: #f8fafc; color: #475569; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 14px 8px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 14px; }
   tr:hover td { background: #f8fafc; }
-  th:first-child, td:first-child { text-align: left; padding-left: 16px; }
-  input.nota { width: 62px; padding: 6px; border: 1.5px solid #cbd5e1; border-radius: 8px; text-align: center; font-weight: 700; font-size: 14px; }
-  input.nota:focus { outline: none; border-color: var(--cor); }
+  th:first-child, td:first-child { text-align: left; padding-left: 18px; }
+  input.nota { width: 64px; padding: 7px 6px; border: 1.5px solid #cbd5e1; border-radius: 9px; text-align: center; font-weight: 700; font-size: 14px; transition: .15s; }
+  input.nota:focus { outline: none; border-color: var(--cor); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
   input.rec { background: #fffbeb; border-color: #fcd34d; }
-  input.falta { width: 56px; background: #f8fafc; }
-  .badge { font-weight: 700; padding: 5px 11px; border-radius: 99px; display: inline-block; font-size: 12px; min-width: 50px; }
+  input.falta { width: 58px; background: #f8fafc; }
+  .badge { font-weight: 700; padding: 6px 12px; border-radius: 99px; display: inline-block; font-size: 12px; min-width: 54px; }
   .azul { background: #dcfce7; color: #15803d; }
   .verm { background: #fee2e2; color: #dc2626; }
   .amar { background: #fef3c7; color: #b45309; }
   .neutro { background: #f1f5f9; color: #64748b; }
-  .empty { padding: 40px 20px; text-align: center; color: var(--muted); border: 1.5px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; }
-  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.55); align-items: center; justify-content: center; padding: 16px; z-index: 99; }
-  .modal { background: #fff; max-width: 460px; width: 100%; border-radius: 16px; padding: 22px; box-shadow: 0 20px 40px rgba(0,0,0,.25); }
-  .modal h3 { margin: 0 0 6px; font-size: 18px; }
-  .modal p { margin: 0 0 12px; font-size: 13px; color: var(--muted); }
-  .campo { margin-bottom: 12px; }
-  .campo label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
-  .campo input { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 9px; font-size: 14px; }
+  .empty { padding: 48px 20px; text-align: center; color: var(--muted); border: 1.5px dashed #cbd5e1; border-radius: 16px; background: #f8fafc; }
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.55); backdrop-filter: blur(3px); align-items: center; justify-content: center; padding: 16px; z-index: 99; }
+  .modal { background: #fff; max-width: 460px; width: 100%; border-radius: 18px; padding: 24px; box-shadow: 0 24px 48px rgba(0,0,0,.22); }
+  .modal h3 { margin: 0 0 6px; font-size: 18px; font-weight: 800; }
+  .modal p { margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+  .campo { margin-bottom: 14px; }
+  .campo label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+  .campo input { width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px; }
   .cores { display: flex; gap: 8px; flex-wrap: wrap; }
-  .cor-opt { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
-  .cor-opt.sel { border-color: #0f172a; transform: scale(1.1); }
-  .modal-acoes { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
-  .toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #fff; padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 120; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s; }
+  .cor-opt { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: .15s; }
+  .cor-opt.sel { border-color: #0f172a; transform: scale(1.12); }
+  .modal-acoes { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .toast { position: fixed; bottom: 22px; right: 22px; background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; z-index: 120; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s; box-shadow: 0 10px 25px rgba(0,0,0,.2); }
   .toast.show { opacity: 1; transform: translateY(0); }
-  @media (max-width: 680px) { .corpo, .topo { padding: 18px; } .btn-d { margin-left: 0; } }
+  @media (max-width: 680px) { .corpo, .topo { padding: 20px; } .btn-d { margin-left: 0; } }
 </style>
 </head>
 <body>
@@ -110,290 +110,3 @@
       <div class="acoes">
         <button type="button" class="btn-p" onclick="carregar()">🔄 Atualizar Lista</button>
         <button type="button" class="btn-s" onclick="exportarBackup()">☁️ Salvar Arquivo</button>
-        <button type="button" class="btn-s" onclick="document.getElementById('arqBackup').click()">📂 Abrir Arquivo</button>
-        <button type="button" class="btn-s" onclick="abrirModalTexto()">📋 Copiar / Colar Código</button>
-        <input type="file" id="arqBackup" accept=".json,application/json,text/plain" style="display:none" onchange="importarBackup(event)">
-        <button type="button" class="btn-e" onclick="baixarExcel()">📥 Exportar Excel</button>
-        <div class="corte-box">
-          <label for="corte">Média mín.:</label>
-          <input type="number" id="corte" step="0.5" min="1" max="10" value="5" onchange="mudarCorte()">
-        </div>
-        <button type="button" class="btn-d" onclick="limparTurma()">🗑️ Limpar Turma</button>
-      </div>
-    </div>
-    const STORAGE_KEY = 'boletim_pro_v6';
-const CORES = ['#2563eb','#059669','#d97706','#0891b2','#7c3aed','#db2777','#dc2626','#4f46e5','#0d9488'];
-const MAT_PADRAO = [
-{ id: 'portugues', nome: 'Português', icone: '📖', cor: '#2563eb' },
-{ id: 'ciencias', nome: 'Ciências', icone: '🔬', cor: '#059669' },
-{ id: 'matematica', nome: 'Matemática', icone: '📐', cor: '#d97706' },
-{ id: 'geografia', nome: 'Geografia', icone: '🌍', cor: '#0891b2' },
-{ id: 'historia', nome: 'História', icone: '🏛️', cor: '#7c3aed' }
-];
-let estado = { corte: 5, turmaAtivaId: 'turma_1', materias: JSON.parse(JSON.stringify(MAT_PADRAO)), turmas: { turma_1: { nome: 'Turma A', alunos: [], notas: {} } } };
-let matAtivaId = 'portugues', corSel = CORES[0];
-const esc = s => String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
-function toast(msg) {
-const el = document.getElementById('toast');
-el.textContent = msg; el.classList.add('show');
-clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2800);
-}
-const status = msg => document.getElementById('statusSave').textContent = msg;
-function garantirEstrutura(t) {
-t.alunos = t.alunos || []; t.notas = t.notas || {};
-estado.materias.forEach(m => {
-t.notas[m.id] = t.notas[m.id] || {};
-t.alunos.forEach(a => { t.notas[m.id][a] = t.notas[m.id][a] || { n1:'', n2:'', n3:'', n4:'', rec:'', faltas:'' }; });
-});
-}
-(function init() {
-try {
-const s6 = localStorage.getItem(STORAGE_KEY);
-if (s6) { const d = JSON.parse(s6); if (d?.turmas && Object.keys(d.turmas).length) estado = d; }
-else {
-const s5 = localStorage.getItem('boletim_salvo_v5') || localStorage.getItem('boletim_salvo_v4');
-if (s5) { const a = JSON.parse(s5); estado.corte = Number(a.corte) || 5; estado.turmas.turma_1.alunos = a.alunos || []; estado.turmas.turma_1.notas = a.notas || {}; }
-}
-} catch (e) {}
-if (!estado.turmas[estado.turmaAtivaId]) estado.turmaAtivaId = Object.keys(estado.turmas)[0];
-if (!estado.materias.some(m => m.id === matAtivaId)) matAtivaId = estado.materias[0].id;
-Object.values(estado.turmas).forEach(garantirEstrutura);
-})();
-function salvar() {
-try {
-localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
-status('💾 Salvo às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
-} catch (e) { status('⚠️ Erro ao salvar'); }
-}
-const turmaAtual = () => estado.turmas[estado.turmaAtivaId];
-function renderTurmas() {
-document.getElementById('selTurma').innerHTML = Object.entries(estado.turmas)
-.map(([id, t]) => <option value="${id}" ${id === estado.turmaAtivaId ? 'selected' : ''}>${esc(t.nome)}</option>).join('');
-}
-function trocarTurma(id) { estado.turmaAtivaId = id; garantirEstrutura(turmaAtual()); salvar(); atualizarUI(); }
-function novaTurma() {
-const n = prompt('Nome da nova turma (ex: 6º Ano B):');
-if (!n?.trim()) return;
-const id = 'turma_' + Date.now();
-estado.turmas[id] = { nome: n.trim(), alunos: [], notas: {} };
-estado.turmaAtivaId = id; garantirEstrutura(estado.turmas[id]);
-salvar(); renderTurmas(); atualizarUI(); toast(✅ Turma "${n.trim()}" criada!);
-}
-function renomearTurma() {
-const t = turmaAtual(), n = prompt('Novo nome da turma:', t.nome);
-if (!n?.trim()) return;
-t.nome = n.trim(); salvar(); renderTurmas(); toast('✏️ Turma renomeada.');
-}
-function excluirTurma() {
-if (Object.keys(estado.turmas).length <= 1) return toast('⚠️ Mantenha ao menos uma turma.');
-const t = turmaAtual();
-if (!confirm(Excluir a turma "${t.nome}"?)) return;
-delete estado.turmas[estado.turmaAtivaId];
-estado.turmaAtivaId = Object.keys(estado.turmas)[0];
-salvar(); renderTurmas(); atualizarUI(); toast('🗑️ Turma excluída.');
-}
-function renderAbas() {
-document.getElementById('listaAbas').innerHTML = estado.materias.map(m =>
-<button type="button" class="tab ${m.id === matAtivaId ? 'ativa' : ''}" onclick="mudarMat('${m.id}')">${m.icone} ${esc(m.nome)}</button>
-).join('');
-const m = estado.materias.find(x => x.id === matAtivaId) || estado.materias[0];
-document.documentElement.style.setProperty('--cor', m.cor);
-document.getElementById('tit').textContent = ${m.icone} ${m.nome};
-document.getElementById('btnDelMat').style.display = estado.materias.length > 1 ? 'inline-flex' : 'none';
-}
-function mudarMat(id) { matAtivaId = id; renderAbas(); if (turmaAtual().alunos.length) desenhar(); }
-function abrirModalMat() {
-document.getElementById('nomeNovaMat').value = '';
-document.getElementById('coresGrid').innerHTML = CORES.map(c =>
-<div class="cor-opt ${c === corSel ? 'sel' : ''}" style="background:${c}" onclick="corSel='${c}';document.querySelectorAll('.cor-opt').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')"></div>
-).join('');
-document.getElementById('modalMat').style.display = 'flex';
-document.getElementById('nomeNovaMat').focus();
-}
-function salvarNovaMateria() {
-const nome = document.getElementById('nomeNovaMat').value.trim();
-if (!nome) return toast('⚠️ Digite o nome da matéria.');
-const id = 'mat_' + Date.now();
-estado.materias.push({ id, nome, icone: '📘', cor: corSel });
-Object.values(estado.turmas).forEach(garantirEstrutura);
-matAtivaId = id; salvar(); renderAbas();
-if (turmaAtual().alunos.length) desenhar();
-fecharModal('modalMat'); toast(📘 "${nome}" adicionada!);
-}
-function removerMateriaAtual() {
-if (estado.materias.length <= 1) return;
-const m = estado.materias.find(x => x.id === matAtivaId);
-if (!confirm(Remover "${m.nome}" de todas as turmas?)) return;
-estado.materias = estado.materias.filter(x => x.id !== matAtivaId);
-Object.values(estado.turmas).forEach(t => delete t.notas[matAtivaId]);
-matAtivaId = estado.materias[0].id; salvar(); renderAbas();
-if (turmaAtual().alunos.length) desenhar();
-toast('🗑️ Matéria removida.');
-}
-function mudarCorte() {
-const v = parseFloat(document.getElementById('corte').value);
-estado.corte = isNaN(v) ? 5 : Math.min(10, Math.max(1, v));
-document.getElementById('corte').value = estado.corte;
-salvar(); if (turmaAtual().alunos.length) desenhar();
-}
-function carregar() {
-const linhas = document.getElementById('txt').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-if (!linhas.length) return toast('⚠️ Cole pelo menos um nome.');
-const t = turmaAtual();
-t.alunos = [...new Set(linhas)];
-estado.materias.forEach(m => {
-const novo = {};
-t.alunos.forEach(a => novo[a] = t.notas[m.id]?.[a] || { n1:'', n2:'', n3:'', n4:'', rec:'', faltas:'' });
-t.notas[m.id] = novo;
-});
-salvar(); atualizarUI(); toast(✅ ${t.alunos.length} aluno(s) carregado(s)!);
-}
-function limparTurma() {
-const t = turmaAtual();
-if (!confirm(Apagar alunos e notas de "${t.nome}"?)) return;
-t.alunos = []; t.notas = {}; garantirEstrutura(t);
-salvar(); atualizarUI(); toast('🗑️ Turma limpa.');
-}
-function obterInfo(o) {
-const bim = [o.n1, o.n2, o.n3, o.n4].filter(x => x !== '' && x != null).map(Number);
-if (!bim.length) return { med: null, sit: '-', cls: 'badge neutro', ok: false, rec: false };
-let calc = [...bim], usouRec = false;
-if (calc.length === 4 && o.rec !== '' && o.rec != null) {
-const r = Number(o.rec), min = Math.min(...calc);
-if (r > min) { calc[calc.indexOf(min)] = r; usouRec = true; }
-}
-const med = (calc.reduce((a, b) => a + b, 0) / calc.length).toFixed(1);
-if (bim.length < 4) return { med, sit: Parcial (${bim.length}/4), cls: 'badge amar', ok: false, rec: false };
-const ap = parseFloat(med) >= estado.corte;
-return { med, sit: ap ? 'Aprovado' : 'Reprovado', cls: ap ? 'badge azul' : 'badge verm', ok: true, rec: usouRec };
-}
-function atualizarResumo() {
-const t = turmaAtual();
-let ap = 0, rp = 0, and = 0;
-t.alunos.forEach(a => {
-const i = obterInfo(t.notas[matAtivaId]?.[a] || {});
-if (i.med !== null) { if (!i.ok) and++; else parseFloat(i.med) >= estado.corte ? ap++ : rp++; }
-});
-document.getElementById('resumo').innerHTML = t.alunos.length
-? <span class="pill">Total: ${t.alunos.length}</span><span class="pill ap">Aprovados: ${ap}</span><span class="pill rp">Reprovados: ${rp}</span><span class="pill and">Em andamento: ${and}</span> : '';
-}
-function calc(idx, k, val) {
-const t = turmaAtual(), a = t.alunos[idx];
-if (k === 'faltas') {
-const f = val === '' ? '' : Math.max(0, parseInt(val, 10));
-t.notas[matAtivaId][a].faltas = isNaN(f) ? '' : f;
-return salvar();
-}
-const n = val === '' ? '' : Math.min(10, Math.max(0, parseFloat(val)));
-t.notas[matAtivaId][a][k] = isNaN(n) ? '' : n;
-salvar();
-const i = obterInfo(t.notas[matAtivaId][a]);
-const elM = document.getElementById('m-' + idx), elS = document.getElementById('s-' + idx);
-elM.textContent = i.med !== null ? (i.rec ? ${i.med} * : i.med) : '-'; elM.className = i.cls;
-elS.textContent = i.sit; elS.className = i.cls;
-atualizarResumo();
-}
-function desenhar() {
-const t = turmaAtual(), tab = document.getElementById('tab');
-if (!t.alunos.length) {
-tab.className = 'empty';
-tab.innerHTML = 'Cole os nomes acima e clique em Atualizar Lista.';
-document.getElementById('resumo').innerHTML = '';
-return;
-}
-let h = 'Aluno1º Bim2º Bim3º Bim4º BimRecup.FaltasMédiaSituação';
-t.alunos.forEach((a, idx) => {
-const o = t.notas[matAtivaId][a] || {}, i = obterInfo(o);
-h += <tr><td><strong>${esc(a)}</strong></td> +
-['n1','n2','n3','n4'].map(k => <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${o[k]??''}" oninput="calc(${idx},'${k}',this.value)"></td>).join('') +
-<td><input type="number" class="nota rec" step="0.1" min="0" max="10" value="${o.rec??''}" oninput="calc(${idx},'rec',this.value)"></td> +
-<td><input type="number" class="nota falta" step="1" min="0" value="${o.faltas??''}" oninput="calc(${idx},'faltas',this.value)"></td> +
-<td><span id="m-${idx}" class="${i.cls}">${i.med !== null ? (i.rec ? i.med+' *' : i.med) : '-'}</span></td> +
-<td><span id="s-${idx}" class="${i.cls}">${i.sit}</span></td></tr>;
-});
-tab.className = 'tab-wrap';
-tab.innerHTML = h + '';
-atualizarResumo();
-}
-function atualizarUI() {
-const t = turmaAtual();
-document.getElementById('corte').value = estado.corte;
-document.getElementById('txt').value = t.alunos.join('\n');
-document.getElementById('contAlunos').textContent = ${t.alunos.length} aluno(s);
-renderAbas(); desenhar();
-}
-function aplicarBackup(txt) {
-const d = JSON.parse(txt.trim().replace(/^\uFEFF/, ''));
-if (d.turmas) estado = d;
-else if (Array.isArray(d.alunos)) {
-const id = 'turma_' + Date.now();
-estado.turmas[id] = { nome: 'Turma Importada', alunos: d.alunos, notas: d.notas || {} };
-estado.turmaAtivaId = id;
-if (d.corte) estado.corte = Number(d.corte);
-} else throw new Error('Formato inválido');
-Object.values(estado.turmas).forEach(garantirEstrutura);
-if (!estado.turmas[estado.turmaAtivaId]) estado.turmaAtivaId = Object.keys(estado.turmas)[0];
-if (!estado.materias.some(m => m.id === matAtivaId)) matAtivaId = estado.materias[0].id;
-salvar(); renderTurmas(); atualizarUI(); status('☁️ Restaurado!'); toast('✅ Backup restaurado!');
-}
-function exportarBackup() {
-const blob = new Blob([JSON.stringify(estado, null, 2)], { type: 'application/json;charset=utf-8' });
-const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-a.download = backup_boletim_${new Date().toISOString().slice(0,10)}.json;
-a.click(); toast('☁️ Backup salvo!');
-}
-function importarBackup(e) {
-const f = e.target.files[0]; if (!f) return;
-const r = new FileReader();
-r.onload = ev => { try { aplicarBackup(ev.target.result); } catch (err) { alert('Erro: ' + err.message); } e.target.value = ''; };
-r.readAsText(f, 'UTF-8');
-}
-function abrirModalTexto() { document.getElementById('txtBackup').value = JSON.stringify(estado); document.getElementById('modalBackup').style.display = 'flex'; }
-const fecharModal = id => document.getElementById(id).style.display = 'none';
-function copiarTextoBackup() {
-const el = document.getElementById('txtBackup'); el.select(); el.setSelectionRange(0, 999999);
-try { document.execCommand('copy'); navigator.clipboard?.writeText(el.value).catch(()=>{}); toast('📋 Código copiado!'); }
-catch (e) { toast('⚠️ Pressione Ctrl+C para copiar.'); }
-}
-function restaurarTextoBackup() {
-try { aplicarBackup(document.getElementById('txtBackup').value); fecharModal('modalBackup'); }
-catch (e) { alert('Código inválido.'); }
-}
-function baixarExcel() {
-const t = turmaAtual();
-if (!t.alunos.length) return toast('⚠️ Adicione alunos primeiro.');
-let xml = '' +
-'';
-xml += '' + estado.materias.map(() => '').join('') +
-<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno (${esc(t.nome)})</Data></Cell> + estado.materias.map(m => <Cell ss:StyleID="h"><Data ss:Type="String">${esc(m.nome)}</Data></Cell>).join('') + '';
-t.alunos.forEach(a => {
-xml += <Row><Cell><Data ss:Type="String">${esc(a)}</Data></Cell>;
-estado.materias.forEach(m => {
-const i = obterInfo(t.notas[m.id]?.[a] || {});
-const st = i.sit === 'Reprovado' ? ' ss:StyleID="rp"' : (i.sit === 'Aprovado' ? ' ss:StyleID="ap"' : (i.med !== null ? ' ss:StyleID="and"' : ''));
-xml += i.med !== null ? <Cell${st}><Data ss:Type="Number">${Number(i.med)}</Data></Cell> : '-';
-});
-xml += '';
-});
-xml += '';
-estado.materias.forEach(m => {
-const aba = m.nome.replace(/[\/?*[]:]/g, '').slice(0, 30);
-xml += <Worksheet ss:Name="${esc(aba)}"><Table><Column ss:Width="190"/><Column ss:Width="60"/><Column ss:Width="60"/><Column ss:Width="60"/><Column ss:Width="60"/><Column ss:Width="65"/><Column ss:Width="60"/><Column ss:Width="75"/><Column ss:Width="110"/> +
-'Aluno1º Bim2º Bim3º Bim4º BimRecup.FaltasMédiaSituação';
-t.alunos.forEach(a => {
-const o = t.notas[m.id]?.[a] || {}, i = obterInfo(o);
-const st = i.sit === 'Reprovado' ? ' ss:StyleID="rp"' : (i.sit === 'Aprovado' ? ' ss:StyleID="ap"' : (i.med !== null ? ' ss:StyleID="and"' : ''));
-const cel = v => (v === '' || v == null) ? '' : <Cell><Data ss:Type="Number">${Number(v)}</Data></Cell>;
-xml += <Row><Cell><Data ss:Type="String">${esc(a)}</Data></Cell>${cel(o.n1)}${cel(o.n2)}${cel(o.n3)}${cel(o.n4)}${cel(o.rec)}${cel(o.faltas)} +
-(i.med !== null ? <Cell><Data ss:Type="Number">${Number(i.med)}</Data></Cell> : '-') + <Cell${st}><Data ss:Type="String">${i.sit}</Data></Cell></Row>;
-});
-xml += '';
-});
-const blob = new Blob([xml + ''], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-a.download = boletim_${t.nome.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.xls; a.click();
-toast('📥 Planilha Excel gerada!');
-}
-window.onload = () => { renderTurmas(); atualizarUI(); if (turmaAtual().alunos.length) status('✅ Dados carregados'); };
-    <div class="abas-wrap">
-      <div class="abas" id="listaAbas"></div>
