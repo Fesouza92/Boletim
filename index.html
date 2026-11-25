@@ -193,13 +193,14 @@
     st.textContent = 'Sincronizando...';
     try {
       const resp = await fetch(FIREBASE_URL);
+      if (!resp.ok) throw new Error('Bloqueado');
       const dadosNuvem = await resp.json();
       if (dadosNuvem && dadosNuvem.turmas) {
         estado = dadosNuvem;
       }
       st.textContent = '☁️ Conectado';
     } catch (e) {
-      st.textContent = '⚠️ Offline';
+      st.textContent = '⚠️ Offline (Verifique Regras)';
     }
     renderizarTudo();
   }
