@@ -47,6 +47,11 @@
     .azul { background: #dbeafe; color: #1d4ed8; }
     .verm { background: #fee2e2; color: #dc2626; }
     .amar { background: #fef3c7; color: #b45309; }
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.55); align-items: center; justify-content: center; padding: 16px; z-index: 99; }
+    .modal { background: #fff; max-width: 500px; width: 100%; border-radius: 14px; padding: 20px; box-shadow: 0 20px 35px rgba(0,0,0,.2); }
+    .modal h3 { margin: 0 0 8px; font-size: 17px; }
+    .modal p { margin: 0 0 12px; font-size: 13px; color: #64748b; }
+    .modal-acoes { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
     @media (max-width: 640px) { .btn-d { margin-left: 0; } }
   </style>
 </head>
@@ -55,7 +60,7 @@
   <div class="topo">
     <div>
       <h1>📚 Boletim & Controle de Notas</h1>
-      <p>Progresso salvo automaticamente no aparelho ou via arquivo para trocar entre PC e celular</p>
+      <p>Progresso salvo automaticamente no aparelho ou via arquivo/código para trocar entre PC e celular</p>
     </div>
     <div class="status-save" id="statusSave">💾 Pronto</div>
   </div>
@@ -63,9 +68,10 @@
     <textarea id="txt" placeholder="Cole os nomes dos alunos aqui (um nome por linha)..."></textarea>
     <div class="acoes">
       <button type="button" class="btn-p" onclick="carregar()">👥 Atualizar Lista</button>
-      <button type="button" class="btn-s" onclick="exportarBackup()" title="Baixa um arquivo para continuar no celular ou outro PC">☁️ Salvar Progresso</button>
-      <button type="button" class="btn-s" onclick="document.getElementById('arqBackup').click()" title="Carrega um arquivo salvo anteriormente">📂 Continuar de Arquivo</button>
-      <input type="file" id="arqBackup" accept=".json" style="display:none" onchange="importarBackup(event)">
+      <button type="button" class="btn-s" onclick="exportarBackup()">☁️ Salvar Progresso</button>
+      <button type="button" class="btn-s" onclick="document.getElementById('arqBackup').click()">📂 Abrir Arquivo</button>
+      <button type="button" class="btn-s" onclick="abrirModalTexto()">📋 Copiar / Colar Backup</button>
+      <input type="file" id="arqBackup" accept="*/*" style="display:none" onchange="importarBackup(event)">
       <button type="button" class="btn-e" onclick="baixarExcel()">📥 Exportar Excel</button>
       <div class="config-corte">
         <label for="corte">Média mín.:</label>
@@ -93,6 +99,20 @@
   </div>
 </div>
 
+<!-- Modal para Copiar/Colar Backup direto (ideal para WhatsApp/Celular) -->
+<div class="modal-bg" id="modalBackup">
+  <div class="modal">
+    <h3>📋 Backup via Texto (WhatsApp / E-mail)</h3>
+    <p>Copie o código abaixo para enviar pelo WhatsApp, ou cole um código recebido e clique em <strong>Restaurar</strong>.</p>
+    <textarea id="txtBackup" style="height:130px;font-family:monospace;font-size:12px" placeholder="Cole o código de backup aqui..."></textarea>
+    <div class="modal-acoes">
+      <button type="button" class="btn-s" onclick="copiarTextoBackup()">📄 Copiar Código</button>
+      <button type="button" class="btn-p" onclick="restaurarTextoBackup()">✅ Restaurar</button>
+      <button type="button" class="btn-d" style="margin-left:0" onclick="fecharModalTexto()">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const STORAGE_KEY = 'boletim_salvo_v5';
 let mat = 'portugues', alunos = [], corte = 5;
@@ -104,8 +124,7 @@ function esc(s) {
 }
 
 function mostrarStatus(msg) {
-  const el = document.getElementById('statusSave');
-  el.textContent = msg;
+  document.getElementById('statusSave').textContent = msg;
 }
 
 try {
@@ -240,10 +259,32 @@ function desenhar() {
   atualizarResumo();
 }
 
+function aplicarDadosRestaurados(textoJson) {
+  const clean = textoJson.trim().replace(/^\uFEFF/, '');
+  const d = JSON.parse(clean);
+  if (!Array.isArray(d.alunos) || typeof d.notas !== 'object') throw new Error('Estrutura inválida');
+  alunos = d.alunos;
+  notas = d.notas;
+  corte = d.corte !== undefined ? Number(d.corte) : 5;
+  
+  Object.keys(Mat).forEach(m => {
+    if (!notas[m]) notas[m] = {};
+    alunos.forEach(a => {
+      if (!notas[m][a]) notas[m][a] = { n1:'', n2:'', n3:'', n4:'' };
+    });
+  });
+
+  document.getElementById('corte').value = corte;
+  document.getElementById('txt').value = alunos.join('\n');
+  salvar();
+  desenhar();
+  mostrarStatus('☁️ Progresso restaurado!');
+}
+
 function exportarBackup() {
   if (!alunos.length) return alert('Não há alunos ou notas para salvar.');
   const dados = JSON.stringify({ alunos, notas, corte, data: new Date().toISOString() }, null, 2);
-  const blob = new Blob([dados], { type: 'application/json' });
+  const blob = new Blob([dados], { type: 'text/plain;charset=utf-8' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
   link.download = `progresso_boletim_${new Date().toISOString().slice(0,10)}.json`;
@@ -256,22 +297,36 @@ function importarBackup(event) {
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      const d = JSON.parse(e.target.result);
-      if (!Array.isArray(d.alunos) || typeof d.notas !== 'object') throw new Error('Formato inválido');
-      alunos = d.alunos;
-      notas = d.notas;
-      corte = d.corte !== undefined ? Number(d.corte) : 5;
-      document.getElementById('corte').value = corte;
-      document.getElementById('txt').value = alunos.join('\n');
-      salvar();
-      desenhar();
-      mostrarStatus('☁️ Backup carregado com sucesso!');
+      aplicarDadosRestaurados(e.target.result);
     } catch (err) {
-      alert('Não foi possível ler este arquivo de progresso.');
+      alert('Erro ao ler o arquivo: ' + err.message + '\n\nDica: Tente usar o botão "Copiar / Colar Backup".');
     }
     event.target.value = '';
   };
-  reader.readAsText(file);
+  reader.readAsText(file, 'UTF-8');
+}
+
+function abrirModalTexto() {
+  document.getElementById('txtBackup').value = alunos.length ? JSON.stringify({ alunos, notas, corte }) : '';
+  document.getElementById('modalBackup').style.display = 'flex';
+}
+function fecharModalTexto() {
+  document.getElementById('modalBackup').style.display = 'none';
+}
+function copiarTextoBackup() {
+  const el = document.getElementById('txtBackup');
+  if (!el.value) return alert('Não há dados para copiar.');
+  el.select();
+  navigator.clipboard?.writeText(el.value);
+  alert('Código copiado! Agora você pode colar no WhatsApp ou e-mail.');
+}
+function restaurarTextoBackup() {
+  try {
+    aplicarDadosRestaurados(document.getElementById('txtBackup').value);
+    fecharModalTexto();
+  } catch (err) {
+    alert('O texto colado não é um backup válido. Verifique se copiou tudo do início { até o final }.');
+  }
 }
 
 function baixarExcel() {
@@ -283,7 +338,6 @@ function baixarExcel() {
     '<Style ss:ID="rp"><Font ss:Bold="1" ss:Color="#DC2626"/></Style>' +
     '<Style ss:ID="and"><Font ss:Bold="1" ss:Color="#B45309"/></Style></Styles>';
 
-  // Aba de Resumo Geral
   xml += '<Worksheet ss:Name="Resumo Geral"><Table><Column ss:Width="180"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="90"/><Column ss:Width="90"/>' +
     '<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno</Data></Cell>' +
     Object.values(Mat).map(nome => `<Cell ss:StyleID="h"><Data ss:Type="String">${nome}</Data></Cell>`).join('') + '</Row>';
@@ -301,7 +355,6 @@ function baixarExcel() {
   });
   xml += '</Table></Worksheet>';
 
-  // Abas por Disciplina
   Object.keys(Mat).forEach(m => {
     xml += `<Worksheet ss:Name="${Mat[m]}"><Table><Column ss:Width="180"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="65"/><Column ss:Width="80"/><Column ss:Width="110"/>` +
       '<Row><Cell ss:StyleID="h"><Data ss:Type="String">Aluno</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 1</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 2</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 3</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Nota 4</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Média</Data></Cell><Cell ss:StyleID="h"><Data ss:Type="String">Situação</Data></Cell></Row>';
