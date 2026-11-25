@@ -102,7 +102,7 @@
         <button class="btn-icon" title="Nova Turma" onclick="novaTurma()">+</button>
         <button class="btn-icon" title="Renomear Turma" onclick="renomearTurma()">✎</button>
       </div>
-      <div class="status-save" id="status-save">✓ Salvo</div>
+      <div class="status-save" id="status-save">☁️ Conectando...</div>
     </div>
   </header>
 
@@ -117,9 +117,6 @@
         <button class="btn-p" onclick="adicionarAlunos()">+ Adicionar Alunos</button>
         <button class="btn-e" onclick="exportarCSV()">⬇ Exportar CSV</button>
         <button class="btn-s" onclick="window.print()">🖨️ Imprimir</button>
-        <button class="btn-s" onclick="exportarBackup()">💾 Baixar Backup</button>
-        <button class="btn-s" onclick="document.getElementById('input-backup').click()">📂 Carregar Backup</button>
-        <input type="file" id="input-backup" accept=".json" style="display:none" onchange="importarBackup(event)">
         <div class="corte-box">
           <span>Nota de Corte:</span>
           <input type="number" id="nota-corte" step="0.5" min="0" max="10" value="6" onchange="atualizarCorte()">
@@ -135,7 +132,7 @@
 
     <div class="barra-mat">
       <div class="mat-tit">
-        <h2 id="titulo-materia">Matemática</h2>
+        <h2 id="titulo-materia">Português</h2>
         <button class="btn-del-mat" onclick="excluirMateria()">Excluir matéria</button>
       </div>
       <div class="resumo" id="resumo-turma"></div>
@@ -151,7 +148,7 @@
     <p>Escolha o nome e a cor de identificação da disciplina.</p>
     <div class="campo">
       <label for="nome-materia">Nome da Matéria</label>
-      <input type="text" id="nome-materia" placeholder="Ex: História, Biologia...">
+      <input type="text" id="nome-materia" placeholder="Ex: Artes, Inglês...">
     </div>
     <div class="campo">
       <label>Cor do Tema</label>
@@ -166,7 +163,7 @@
 
 <div class="toast" id="toast"></div>
 <script>
-    const STORAGE_KEY = 'boletim_escolar_pro_v2';
+  const FIREBASE_URL = 'https://firebaseio.com';
   const PALETA = ['#4f46e5', '#0284c7', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#334155'];
   let corSelecionada = PALETA[0];
 
@@ -178,7 +175,7 @@
     { id: 'm5', nome: 'Ciências', cor: '#059669' }
   ];
 
-  let estado = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+  let estado = {
     turmaAtual: 't1',
     turmas: {
       t1: {
@@ -191,11 +188,35 @@
     }
   };
 
-  function salvarDados(msgToast = '') {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+  async function carregarDaNuvem() {
+    const st = document.getElementById('status-save');
+    st.textContent = 'Sincronizando...';
+    try {
+      const resp = await fetch(FIREBASE_URL);
+      const dadosNuvem = await resp.json();
+      if (dadosNuvem && dadosNuvem.turmas) {
+        estado = dadosNuvem;
+      }
+      st.textContent = '☁️ Conectado';
+    } catch (e) {
+      st.textContent = '⚠️ Offline';
+    }
+    renderizarTudo();
+  }
+
+  async function salvarDados(msgToast = '') {
     const st = document.getElementById('status-save');
     st.textContent = 'Salvando...';
-    setTimeout(() => { st.textContent = '✓ Salvo'; }, 400);
+    try {
+      await fetch(FIREBASE_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(estado)
+      });
+      st.textContent = '☁️ Salvo na nuvem';
+    } catch (e) {
+      st.textContent = '⚠️ Erro ao salvar';
+    }
     if (msgToast) mostrarToast(msgToast);
   }
 
@@ -220,7 +241,7 @@
     ).join('');
 
     document.getElementById('nota-corte').value = turma.corte;
-    document.getElementById('total-alunos-turma').textContent = `${turma.alunos.length} aluno(s)`;
+    document.getElementById('total-alunos-turma').textContent = `${(turma.alunos || []).length} aluno(s)`;
 
     const abasEl = document.getElementById('lista-abas');
     abasEl.innerHTML = turma.materias.map(m =>
@@ -238,13 +259,13 @@
   }
 
   function calcularDesempenho(notasObj, corte) {
-    const vals = [notasObj.b1, notasObj.b2, notasObj.b3, notasObj.b4].filter(v => v !== '' && v !== null && !isNaN(v)).map(Number);
+    const vals = [notasObj.b1, notasObj.b2, notasObj.b3, notasObj.b4].filter(v => v !== '' && v !== null && v !== undefined && !isNaN(v)).map(Number);
     if (vals.length === 0) return { media: null, status: 'Em andamento', classe: 'neutro' };
 
     const soma = vals.reduce((a, b) => a + b, 0);
     let media = soma / vals.length;
 
-    if (vals.length === 4 && media < corte && notasObj.rec !== '' && notasObj.rec !== null && !isNaN(notasObj.rec)) {
+    if (vals.length === 4 && media < corte && notasObj.rec !== '' && notasObj.rec !== null && notasObj.rec !== undefined && !isNaN(notasObj.rec)) {
       const rec = Number(notasObj.rec);
       media = Math.max(media, (media + rec) / 2);
     }
@@ -260,6 +281,7 @@
 
   function renderizarTabela() {
     const turma = getTurma();
+    if (!turma.alunos) turma.alunos = [];
     const area = document.getElementById('area-tabela');
     const resumoEl = document.getElementById('resumo-turma');
 
@@ -272,6 +294,7 @@
     let aprovados = 0, reprovados = 0, cursando = 0;
 
     const linhas = turma.alunos.map((aluno, idx) => {
+      if (!aluno.notas) aluno.notas = {};
       if (!aluno.notas[turma.materiaAtual]) {
         aluno.notas[turma.materiaAtual] = { b1: '', b2: '', b3: '', b4: '', rec: '', faltas: 0 };
       }
@@ -285,11 +308,11 @@
       return `
         <tr>
           <td><strong>${aluno.nome}</strong></td>
-          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b1}" onchange="atualizarNota(${idx}, 'b1', this.value)"></td>
-          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b2}" onchange="atualizarNota(${idx}, 'b2', this.value)"></td>
-          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b3}" onchange="atualizarNota(${idx}, 'b3', this.value)"></td>
-          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b4}" onchange="atualizarNota(${idx}, 'b4', this.value)"></td>
-          <td><input type="number" class="nota rec" step="0.1" min="0" max="10" value="${n.rec}" placeholder="-" onchange="atualizarNota(${idx}, 'rec', this.value)"></td>
+          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b1 ?? ''}" onchange="atualizarNota(${idx}, 'b1', this.value)"></td>
+          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b2 ?? ''}" onchange="atualizarNota(${idx}, 'b2', this.value)"></td>
+          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b3 ?? ''}" onchange="atualizarNota(${idx}, 'b3', this.value)"></td>
+          <td><input type="number" class="nota" step="0.1" min="0" max="10" value="${n.b4 ?? ''}" onchange="atualizarNota(${idx}, 'b4', this.value)"></td>
+          <td><input type="number" class="nota rec" step="0.1" min="0" max="10" value="${n.rec ?? ''}" placeholder="-" onchange="atualizarNota(${idx}, 'rec', this.value)"></td>
           <td><input type="number" class="nota falta" min="0" value="${n.faltas || 0}" onchange="atualizarNota(${idx}, 'faltas', this.value)"></td>
           <td><span class="badge ${res.classe}">${res.media !== null ? res.media : '-'}</span></td>
           <td><span class="badge ${res.classe}">${res.status}</span></td>
@@ -341,6 +364,7 @@
     if (!nomes.length) return mostrarToast('Digite pelo menos um nome.');
 
     const turma = getTurma();
+    if (!turma.alunos) turma.alunos = [];
     nomes.forEach(nome => {
       turma.alunos.push({ id: 'a_' + Date.now() + Math.random(), nome, notas: {} });
     });
@@ -357,17 +381,14 @@
   }
 
   function novaTurma() {
-    const nome = prompt('Nome da nova turma (ex: 1º Ano B):');
+    const nome = prompt('Nome da nova turma (ex: 5º Ano A):');
     if (!nome || !nome.trim()) return;
     const id = 't_' + Date.now();
     estado.turmas[id] = {
       nome: nome.trim(),
       corte: 6.0,
       materiaAtual: 'm1',
-      materias: [
-        { id: 'm1', nome: 'Matemática', cor: '#4f46e5' },
-        { id: 'm2', nome: 'Português', cor: '#0284c7' }
-      ],
+      materias: MATERIAS_PADRAO(),
       alunos: []
     };
     estado.turmaAtual = id;
@@ -450,12 +471,12 @@
 
   function exportarCSV() {
     const turma = getTurma();
-    if (!turma.alunos.length) return mostrarToast('Não há dados para exportar.');
+    if (!turma.alunos || !turma.alunos.length) return mostrarToast('Não há dados para exportar.');
     const mat = turma.materias.find(m => m.id === turma.materiaAtual);
     let csv = `Turma: ${turma.nome} | Materia: ${mat.nome}\nAluno;1 Bim;2 Bim;3 Bim;4 Bim;Recuperacao;Faltas;Media;Situacao\n`;
 
     turma.alunos.forEach(a => {
-      const n = a.notas[mat.id] || { b1: '', b2: '', b3: '', b4: '', rec: '', faltas: 0 };
+      const n = (a.notas && a.notas[mat.id]) || { b1: '', b2: '', b3: '', b4: '', rec: '', faltas: 0 };
       const res = calcularDesempenho(n, turma.corte);
       csv += `${a.nome};${n.b1};${n.b2};${n.b3};${n.b4};${n.rec};${n.faltas || 0};${res.media || '-'};${res.status}\n`;
     });
@@ -467,41 +488,8 @@
     link.click();
     mostrarToast('Planilha CSV exportada!');
   }
-  function exportarBackup() {
-    const dados = JSON.stringify(estado);
-    const blob = new Blob([dados], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    const dataHoje = new Date().toISOString().slice(0, 10);
-    link.download = `Backup_Boletim_${dataHoje}.json`;
-    link.click();
-    mostrarToast('Backup salvo! Envie o arquivo para o outro aparelho.');
-  }
 
-  function importarBackup(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const importado = JSON.parse(e.target.result);
-        if (importado && importado.turmas) {
-          estado = importado;
-          salvarDados('Dados restaurados com sucesso!');
-          renderizarTudo();
-        } else {
-          mostrarToast('Arquivo de backup inválido.');
-        }
-      } catch (err) {
-        mostrarToast('Erro ao ler o arquivo.');
-      }
-      event.target.value = '';
-    };
-    reader.readAsText(file);
-  }
-
-  renderizarTudo();
+  carregarDaNuvem();
 </script>
 </body>
 </html>
-
